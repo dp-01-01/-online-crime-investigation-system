@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+
+{% block title %}
+Add New Evidence - Crime Investigation System
+{% endblock %}
+
+{% block content %}
+
+<div class="container mt-5">
+
+    <h1>Add New Evidence</h1>
+
+    <p class="text-muted">
+        Enter evidence details related to a crime case.
+    </p>
+
+
+    <div class="card shadow mt-4">
+
+        <div class="card-body">
+
+            <form method="POST">
+
+
+                <!-- Case Number -->
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        Case Number
+                    </label>
+
+                    <input
+                        type="text"
+                        name="case_number"
+                        class="form-control"
+                        placeholder="Example: CASE001"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- Evidence Type -->
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        Evidence Type
+                    </label>
+
+                    <select
+                        name="evidence_type"
+                        class="form-control"
+                        required
+                    >
+
+                        <option value="">
+                            Select Evidence Type
+                        </option>
+
+                        <option value="Document">
+                            Document
+                        </option>
+
+                        <option value="Photograph">
+                            Photograph
+                        </option>
+
+                        <option value="Fingerprint">
+                            Fingerprint
+                        </option>
+
+                        <option value="Digital Evidence">
+                            Digital Evidence
+                        </option>
+
+                        <option value="Physical Evidence">
+                            Physical Evidence
+                        </option>
+
+                        <option value="Other">
+                            Other
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- Description -->
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        Description
+                    </label>
+
+                    <textarea
+                        name="description"
+                        class="form-control"
+                        rows="4"
+                        placeholder="Enter evidence description"
+                    ></textarea>
+
+                </div>
+
+
+                <!-- Collected Date -->
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        Collected Date
+                    </label>
+
+                    <input
+                        type="date"
+                        name="collected_date"
+                        class="form-control"
+                    >
+
+                </div>
+
+
+                <!-- Collected By -->
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        Collected By
+                    </label>
+
+                    <input
+                        type="text"
+                        name="collected_by"
+                        class="form-control"
+                        placeholder="Example: Officer Ravi"
+                    >
+
+                </div>
+
+
+                <!-- Location Found -->
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        Location Found
+                    </label>
+
+                    <input
+                        type="text"
+                        name="location_found"
+                        class="form-control"
+                        placeholder="Example: Sample Location"
+                    >
+
+                </div>
+
+
+                <!-- Status -->
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        Status
+                    </label>
+
+                    <select
+                        name="status"
+                        class="form-control"
+                    >
+
+                        <option value="Collected">
+                            Collected
+                        </option>
+
+                        <option value="Under Examination">
+                            Under Examination
+                        </option>
+
+                        <option value="Verified">
+                            Verified
+                        </option>
+
+                        <option value="Stored">
+                            Stored
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- Buttons -->
+                <button
+                    type="submit"
+                    class="btn btn-dark"
+                >
+                    Add Evidence
+                </button>
+
+                <a
+                    href="/evidence"
+                    class="btn btn-outline-dark"
+                >
+                    Cancel
+                </a>
+
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

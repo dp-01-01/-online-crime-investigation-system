@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}
+Suspect Management - Crime Investigation System
+{% endblock %}
+
+{% block content %}
+
+<div class="container mt-5">
+
+    <h1>Suspect Management</h1>
+
+    <p class="text-muted">
+        Manage suspect information related to crime cases.
+    </p>
+
+    <div class="mt-4">
+
+        <a href="/add-suspect" class="btn btn-dark">
+            Add New Suspect
+        </a>
+
+        <a href="/dashboard" class="btn btn-outline-dark">
+            Back to Dashboard
+        </a>
+
+    </div>
+
+
+    <div class="card shadow mt-4">
+
+        <div class="card-body">
+
+            <h4>All Suspects</h4>
+
+            <div class="table-responsive">
+
+                <table class="table table-bordered table-striped mt-3">
+
+                    <thead class="table-dark">
+
+                        <tr>
+                            <th>ID</th>
+                            <th>Case Number</th>
+                            <th>Name</th>
+                            <th>Age</th>
+                            <th>Gender</th>
+                            <th>Phone</th>
+                            <th>Address</th>
+                            <th>Status</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        {% for suspect in suspects %}
+
+                        <tr>
+
+                            <td>
+                                {{ suspect.id }}
+                            </td>
+
+                            <td>
+                                {{ suspect.case_number }}
+                            </td>
+
+                            <td>
+                                {{ suspect.name }}
+                            </td>
+
+                            <td>
+                                {{ suspect.age }}
+                            </td>
+
+                            <td>
+                                {{ suspect.gender }}
+                            </td>
+
+                            <td>
+                                {{ suspect.phone }}
+                            </td>
+
+                            <td>
+                                {{ suspect.address }}
+                            </td>
+
+                            <td>
+                                {{ suspect.status }}
+                            </td>
+
+                        </tr>
+
+                        {% else %}
+
+                        <tr>
+
+                            <td
+                                colspan="8"
+                                class="text-center"
+                            >
+                                No suspects found.
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

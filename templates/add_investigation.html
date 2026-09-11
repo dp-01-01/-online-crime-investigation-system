@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+
+{% block title %}
+Add New Investigation - Crime Investigation System
+{% endblock %}
+
+{% block content %}
+
+<div class="container mt-5">
+
+    <h1>Add New Investigation</h1>
+
+    <p class="text-muted">
+        Enter investigation details related to a crime case.
+    </p>
+
+
+    <div class="card shadow mt-4">
+
+        <div class="card-body">
+
+            <form method="POST">
+
+
+                <!-- Case Number -->
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        Case Number
+                    </label>
+
+                    <input
+                        type="text"
+                        name="case_number"
+                        class="form-control"
+                        placeholder="Example: CASE001"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- Investigator -->
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        Investigator
+                    </label>
+
+                    <input
+                        type="text"
+                        name="investigator"
+                        class="form-control"
+                        placeholder="Example: Officer Ravi"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- Investigation Date -->
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        Investigation Date
+                    </label>
+
+                    <input
+                        type="date"
+                        name="investigation_date"
+                        class="form-control"
+                    >
+
+                </div>
+
+
+                <!-- Investigation Type -->
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        Investigation Type
+                    </label>
+
+                    <select
+                        name="investigation_type"
+                        class="form-control"
+                    >
+
+                        <option value="">
+                            Select Investigation Type
+                        </option>
+
+                        <option value="Interview">
+                            Interview
+                        </option>
+
+                        <option value="Site Visit">
+                            Site Visit
+                        </option>
+
+                        <option value="Evidence Analysis">
+                            Evidence Analysis
+                        </option>
+
+                        <option value="Suspect Verification">
+                            Suspect Verification
+                        </option>
+
+                        <option value="Witness Verification">
+                            Witness Verification
+                        </option>
+
+                        <option value="Digital Investigation">
+                            Digital Investigation
+                        </option>
+
+                        <option value="Other">
+                            Other
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- Investigation Details -->
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        Investigation Details
+                    </label>
+
+                    <textarea
+                        name="details"
+                        class="form-control"
+                        rows="4"
+                        placeholder="Enter investigation details"
+                    ></textarea>
+
+                </div>
+
+
+                <!-- Findings -->
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        Findings
+                    </label>
+
+                    <textarea
+                        name="findings"
+                        class="form-control"
+                        rows="4"
+                        placeholder="Enter investigation findings"
+                    ></textarea>
+
+                </div>
+
+
+                <!-- Status -->
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        Status
+                    </label>
+
+                    <select
+                        name="status"
+                        class="form-control"
+                    >
+
+                        <option value="In Progress">
+                            In Progress
+                        </option>
+
+                        <option value="Completed">
+                            Completed
+                        </option>
+
+                        <option value="Pending">
+                            Pending
+                        </option>
+
+                        <option value="Closed">
+                            Closed
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- Buttons -->
+                <button
+                    type="submit"
+                    class="btn btn-dark"
+                >
+                    Add Investigation
+                </button>
+
+                <a
+                    href="/investigations"
+                    class="btn btn-outline-dark"
+                >
+                    Cancel
+                </a>
+
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

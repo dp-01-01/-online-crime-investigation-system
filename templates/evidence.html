@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}
+Evidence Management - Crime Investigation System
+{% endblock %}
+
+{% block content %}
+
+<div class="container mt-5">
+
+    <h1>Evidence Management</h1>
+
+    <p class="text-muted">
+        Manage evidence collected during crime investigations.
+    </p>
+
+
+    <!-- Buttons -->
+    <div class="mt-4">
+
+        <a
+            href="/add-evidence"
+            class="btn btn-dark"
+        >
+            Add New Evidence
+        </a>
+
+        <a
+            href="/dashboard"
+            class="btn btn-outline-dark"
+        >
+            Back to Dashboard
+        </a>
+
+    </div>
+
+
+    <!-- Evidence Table -->
+    <div class="card shadow mt-4">
+
+        <div class="card-body">
+
+            <h4>All Evidence</h4>
+
+            <div class="table-responsive">
+
+                <table class="table table-bordered table-striped mt-3">
+
+                    <thead class="table-dark">
+
+                        <tr>
+                            <th>ID</th>
+                            <th>Case Number</th>
+                            <th>Evidence Type</th>
+                            <th>Description</th>
+                            <th>Collected Date</th>
+                            <th>Collected By</th>
+                            <th>Location Found</th>
+                            <th>Status</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        {% for item in evidence %}
+
+                        <tr>
+
+                            <td>{{ item.id }}</td>
+
+                            <td>
+                                {{ item.case_number }}
+                            </td>
+
+                            <td>
+                                {{ item.evidence_type }}
+                            </td>
+
+                            <td>
+                                {{ item.description }}
+                            </td>
+
+                            <td>
+                                {{ item.collected_date }}
+                            </td>
+
+                            <td>
+                                {{ item.collected_by }}
+                            </td>
+
+                            <td>
+                                {{ item.location_found }}
+                            </td>
+
+                            <td>
+                                {{ item.status }}
+                            </td>
+
+                        </tr>
+
+                        {% else %}
+
+                        <tr>
+
+                            <td
+                                colspan="8"
+                                class="text-center"
+                            >
+                                No evidence found.
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
