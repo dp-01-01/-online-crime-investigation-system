@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block title %}
+Reports - Crime Investigation System
+{% endblock %}
+
+{% block content %}
+
+<div class="container mt-5">
+
+    <!-- Page Heading -->
+    <h1 class="mb-3">
+        Crime Investigation Reports
+    </h1>
+
+    <p class="text-muted">
+        Overview of crime cases and investigation records.
+    </p>
+
+
+    <!-- Buttons -->
+    <div class="mt-4 mb-4">
+
+        <a
+            href="/dashboard"
+            class="btn btn-outline-dark"
+        >
+            Back to Dashboard
+        </a>
+
+    </div>
+
+
+    <!-- Report Cards -->
+    <div class="row">
+
+
+        <!-- Total Cases -->
+        <div class="col-md-4 mb-4">
+
+            <div class="card shadow h-100">
+
+                <div class="card-body text-center">
+
+                    <h5>
+                        Total Cases
+                    </h5>
+
+                    <h2>
+                        {{ total_cases }}
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Open Cases -->
+        <div class="col-md-4 mb-4">
+
+            <div class="card shadow h-100">
+
+                <div class="card-body text-center">
+
+                    <h5>
+                        Open Cases
+                    </h5>
+
+                    <h2>
+                        {{ open_cases }}
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Closed Cases -->
+        <div class="col-md-4 mb-4">
+
+            <div class="card shadow h-100">
+
+                <div class="card-body text-center">
+
+                    <h5>
+                        Closed Cases
+                    </h5>
+
+                    <h2>
+                        {{ closed_cases }}
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Total Victims -->
+        <div class="col-md-4 mb-4">
+
+            <div class="card shadow h-100">
+
+                <div class="card-body text-center">
+
+                    <h5>
+                        Total Victims
+                    </h5>
+
+                    <h2>
+                        {{ total_victims }}
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Total Suspects -->
+        <div class="col-md-4 mb-4">
+
+            <div class="card shadow h-100">
+
+                <div class="card-body text-center">
+
+                    <h5>
+                        Total Suspects
+                    </h5>
+
+                    <h2>
+                        {{ total_suspects }}
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Total Evidence -->
+        <div class="col-md-4 mb-4">
+
+            <div class="card shadow h-100">
+
+                <div class="card-body text-center">
+
+                    <h5>
+                        Total Evidence
+                    </h5>
+
+                    <h2>
+                        {{ total_evidence }}
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Total Investigations -->
+        <div class="col-md-4 mb-4">
+
+            <div class="card shadow h-100">
+
+                <div class="card-body text-center">
+
+                    <h5>
+                        Total Investigations
+                    </h5>
+
+                    <h2>
+                        {{ total_investigations }}
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+</div>
+
+{% endblock %}
