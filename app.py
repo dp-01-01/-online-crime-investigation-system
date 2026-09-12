@@ -147,13 +147,29 @@ def register():
 
     if request.method == "POST":
 
-        username = request.form["username"]
-        email = request.form["email"]
-        password = request.form["password"]
+        username = request.form.get("username", "").strip()
+        email = request.form.get("email", "").strip()
+        password = request.form.get("password", "")
 
         # Public registration is always for citizens.
         # Do not trust the role sent by the browser.
         role = "citizen"
+
+        # Basic validation
+
+        if not username or not email or not password:
+
+            return render_template(
+                "register.html",
+                error="Please fill in all fields."
+            )
+
+        if len(password) < 6:
+
+            return render_template(
+                "register.html",
+                error="Password must contain at least 6 characters."
+            )
 
         hashed_password = generate_password_hash(password)
 
@@ -161,6 +177,31 @@ def register():
         cursor = connection.cursor()
 
         try:
+
+            # Check whether username or email already exists
+
+            check_query = """
+                SELECT id
+                FROM users
+                WHERE username = %s
+                   OR email = %s
+            """
+
+            cursor.execute(
+                check_query,
+                (username, email)
+            )
+
+            existing_user = cursor.fetchone()
+
+            if existing_user:
+
+                return render_template(
+                    "register.html",
+                    error="Username or email already exists. Please use a different one."
+                )
+
+            # Insert new citizen account
 
             query = """
                 INSERT INTO users
@@ -184,11 +225,14 @@ def register():
 
             connection.commit()
 
-        except mysql.connector.Error as error:
+        except mysql.connector.Error:
 
             connection.rollback()
 
-            return f"Registration failed: {error}"
+            return render_template(
+                "register.html",
+                error="Registration failed. Please try again."
+            )
 
         finally:
 
@@ -198,7 +242,6 @@ def register():
         return redirect(url_for("login"))
 
     return render_template("register.html")
-
 # =========================
 # DASHBOARD PAGE
 # =========================
