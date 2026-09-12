@@ -9,46 +9,92 @@ Dashboard - Crime Investigation System
 <div class="container py-5">
 
     <!-- Dashboard Header -->
+
     <div class="mb-5">
 
-        <h1 class="fw-bold">
-            Welcome, {{ session.get("username") }}
-        </h1>
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center">
 
-        <p class="text-muted">
-            Online Crime Investigation System Dashboard
-        </p>
+            <div>
 
-        <span class="badge bg-dark">
-            Role: {{ session.get("role")|title }}
-        </span>
+                <span class="badge bg-dark mb-2">
+                    Crime Investigation Management
+                </span>
+
+                <h1 class="fw-bold mb-2">
+                    Welcome, {{ session.get("username") }}
+                </h1>
+
+                <p class="text-muted mb-0">
+                    Manage crime investigation records from one centralized dashboard.
+                </p>
+
+            </div>
+
+            <div class="mt-3 mt-md-0">
+
+                <span class="badge bg-secondary fs-6 px-3 py-2">
+                    Role: {{ session.get("role")|title }}
+                </span>
+
+            </div>
+
+        </div>
 
     </div>
 
 
-    <!-- ADMIN / INVESTIGATOR DASHBOARD -->
-
     {% if session.get("role") in ["admin", "investigator"] %}
 
 
-    <!-- Dashboard Statistics -->
+    <!-- =========================
+         SYSTEM OVERVIEW
+    ========================== -->
+
+    <div class="mb-4">
+
+        <h3 class="fw-bold">
+            System Overview
+        </h3>
+
+        <p class="text-muted">
+            Current crime investigation statistics
+        </p>
+
+    </div>
+
+
+    <!-- Statistics -->
 
     <div class="row g-4 mb-5">
 
+
         <!-- Total Cases -->
+
         <div class="col-md-6 col-lg-4">
 
-            <div class="card shadow-sm border-0 h-100">
+            <div class="card border-0 shadow-sm h-100">
 
-                <div class="card-body">
+                <div class="card-body p-4">
 
-                    <h6 class="text-muted">
-                        Total Cases
-                    </h6>
+                    <div class="d-flex justify-content-between align-items-center">
 
-                    <h2 class="fw-bold">
-                        {{ total_cases }}
-                    </h2>
+                        <div>
+
+                            <p class="text-muted mb-1">
+                                Total Cases
+                            </p>
+
+                            <h2 class="fw-bold mb-0">
+                                {{ total_cases }}
+                            </h2>
+
+                        </div>
+
+                        <div class="fs-1">
+                            📁
+                        </div>
+
+                    </div>
 
                 </div>
 
@@ -58,19 +104,32 @@ Dashboard - Crime Investigation System
 
 
         <!-- Open Cases -->
+
         <div class="col-md-6 col-lg-4">
 
-            <div class="card shadow-sm border-0 h-100">
+            <div class="card border-0 shadow-sm h-100">
 
-                <div class="card-body">
+                <div class="card-body p-4">
 
-                    <h6 class="text-muted">
-                        Open Cases
-                    </h6>
+                    <div class="d-flex justify-content-between align-items-center">
 
-                    <h2 class="fw-bold">
-                        {{ open_cases }}
-                    </h2>
+                        <div>
+
+                            <p class="text-muted mb-1">
+                                Open Cases
+                            </p>
+
+                            <h2 class="fw-bold mb-0">
+                                {{ open_cases }}
+                            </h2>
+
+                        </div>
+
+                        <div class="fs-1">
+                            🔓
+                        </div>
+
+                    </div>
 
                 </div>
 
@@ -80,19 +139,32 @@ Dashboard - Crime Investigation System
 
 
         <!-- Total Victims -->
+
         <div class="col-md-6 col-lg-4">
 
-            <div class="card shadow-sm border-0 h-100">
+            <div class="card border-0 shadow-sm h-100">
 
-                <div class="card-body">
+                <div class="card-body p-4">
 
-                    <h6 class="text-muted">
-                        Total Victims
-                    </h6>
+                    <div class="d-flex justify-content-between align-items-center">
 
-                    <h2 class="fw-bold">
-                        {{ total_victims }}
-                    </h2>
+                        <div>
+
+                            <p class="text-muted mb-1">
+                                Total Victims
+                            </p>
+
+                            <h2 class="fw-bold mb-0">
+                                {{ total_victims }}
+                            </h2>
+
+                        </div>
+
+                        <div class="fs-1">
+                            👤
+                        </div>
+
+                    </div>
 
                 </div>
 
@@ -102,19 +174,32 @@ Dashboard - Crime Investigation System
 
 
         <!-- Total Suspects -->
+
         <div class="col-md-6 col-lg-4">
 
-            <div class="card shadow-sm border-0 h-100">
+            <div class="card border-0 shadow-sm h-100">
 
-                <div class="card-body">
+                <div class="card-body p-4">
 
-                    <h6 class="text-muted">
-                        Total Suspects
-                    </h6>
+                    <div class="d-flex justify-content-between align-items-center">
 
-                    <h2 class="fw-bold">
-                        {{ total_suspects }}
-                    </h2>
+                        <div>
+
+                            <p class="text-muted mb-1">
+                                Total Suspects
+                            </p>
+
+                            <h2 class="fw-bold mb-0">
+                                {{ total_suspects }}
+                            </h2>
+
+                        </div>
+
+                        <div class="fs-1">
+                            🔎
+                        </div>
+
+                    </div>
 
                 </div>
 
@@ -124,19 +209,32 @@ Dashboard - Crime Investigation System
 
 
         <!-- Total Evidence -->
+
         <div class="col-md-6 col-lg-4">
 
-            <div class="card shadow-sm border-0 h-100">
+            <div class="card border-0 shadow-sm h-100">
 
-                <div class="card-body">
+                <div class="card-body p-4">
 
-                    <h6 class="text-muted">
-                        Total Evidence
-                    </h6>
+                    <div class="d-flex justify-content-between align-items-center">
 
-                    <h2 class="fw-bold">
-                        {{ total_evidence }}
-                    </h2>
+                        <div>
+
+                            <p class="text-muted mb-1">
+                                Total Evidence
+                            </p>
+
+                            <h2 class="fw-bold mb-0">
+                                {{ total_evidence }}
+                            </h2>
+
+                        </div>
+
+                        <div class="fs-1">
+                            🧾
+                        </div>
+
+                    </div>
 
                 </div>
 
@@ -145,20 +243,33 @@ Dashboard - Crime Investigation System
         </div>
 
 
-        <!-- Total Investigations -->
+        <!-- Investigations -->
+
         <div class="col-md-6 col-lg-4">
 
-            <div class="card shadow-sm border-0 h-100">
+            <div class="card border-0 shadow-sm h-100">
 
-                <div class="card-body">
+                <div class="card-body p-4">
 
-                    <h6 class="text-muted">
-                        Investigations
-                    </h6>
+                    <div class="d-flex justify-content-between align-items-center">
 
-                    <h2 class="fw-bold">
-                        {{ total_investigations }}
-                    </h2>
+                        <div>
+
+                            <p class="text-muted mb-1">
+                                Investigations
+                            </p>
+
+                            <h2 class="fw-bold mb-0">
+                                {{ total_investigations }}
+                            </h2>
+
+                        </div>
+
+                        <div class="fs-1">
+                            🕵️
+                        </div>
+
+                    </div>
 
                 </div>
 
@@ -169,19 +280,40 @@ Dashboard - Crime Investigation System
     </div>
 
 
-    <!-- Management Cards -->
+    <!-- =========================
+         MANAGEMENT MODULES
+    ========================== -->
+
+    <div class="mb-4">
+
+        <h3 class="fw-bold">
+            Management Modules
+        </h3>
+
+        <p class="text-muted">
+            Access and manage different sections of the system.
+        </p>
+
+    </div>
+
 
     <div class="row g-4">
 
+
         <!-- Case Management -->
+
         <div class="col-md-6 col-lg-4">
 
-            <div class="card h-100 shadow-sm border-0">
+            <div class="card border-0 shadow-sm h-100">
 
-                <div class="card-body">
+                <div class="card-body p-4">
 
-                    <h4 class="card-title">
-                        📁 Case Management
+                    <div class="fs-2 mb-3">
+                        📁
+                    </div>
+
+                    <h4 class="fw-bold">
+                        Case Management
                     </h4>
 
                     <p class="text-muted">
@@ -192,7 +324,7 @@ Dashboard - Crime Investigation System
                         href="/cases"
                         class="btn btn-dark"
                     >
-                        Manage Cases
+                        Manage Cases →
                     </a>
 
                 </div>
@@ -203,14 +335,19 @@ Dashboard - Crime Investigation System
 
 
         <!-- Victim Management -->
+
         <div class="col-md-6 col-lg-4">
 
-            <div class="card h-100 shadow-sm border-0">
+            <div class="card border-0 shadow-sm h-100">
 
-                <div class="card-body">
+                <div class="card-body p-4">
 
-                    <h4 class="card-title">
-                        👤 Victim Management
+                    <div class="fs-2 mb-3">
+                        👤
+                    </div>
+
+                    <h4 class="fw-bold">
+                        Victim Management
                     </h4>
 
                     <p class="text-muted">
@@ -221,7 +358,7 @@ Dashboard - Crime Investigation System
                         href="/victims"
                         class="btn btn-dark"
                     >
-                        Manage Victims
+                        Manage Victims →
                     </a>
 
                 </div>
@@ -232,14 +369,19 @@ Dashboard - Crime Investigation System
 
 
         <!-- Suspect Management -->
+
         <div class="col-md-6 col-lg-4">
 
-            <div class="card h-100 shadow-sm border-0">
+            <div class="card border-0 shadow-sm h-100">
 
-                <div class="card-body">
+                <div class="card-body p-4">
 
-                    <h4 class="card-title">
-                        🔎 Suspect Management
+                    <div class="fs-2 mb-3">
+                        🔎
+                    </div>
+
+                    <h4 class="fw-bold">
+                        Suspect Management
                     </h4>
 
                     <p class="text-muted">
@@ -250,7 +392,7 @@ Dashboard - Crime Investigation System
                         href="/suspects"
                         class="btn btn-dark"
                     >
-                        Manage Suspects
+                        Manage Suspects →
                     </a>
 
                 </div>
@@ -261,14 +403,19 @@ Dashboard - Crime Investigation System
 
 
         <!-- Evidence Management -->
+
         <div class="col-md-6 col-lg-4">
 
-            <div class="card h-100 shadow-sm border-0">
+            <div class="card border-0 shadow-sm h-100">
 
-                <div class="card-body">
+                <div class="card-body p-4">
 
-                    <h4 class="card-title">
-                        🧾 Evidence Management
+                    <div class="fs-2 mb-3">
+                        🧾
+                    </div>
+
+                    <h4 class="fw-bold">
+                        Evidence Management
                     </h4>
 
                     <p class="text-muted">
@@ -279,7 +426,7 @@ Dashboard - Crime Investigation System
                         href="/evidence"
                         class="btn btn-dark"
                     >
-                        Manage Evidence
+                        Manage Evidence →
                     </a>
 
                 </div>
@@ -290,14 +437,19 @@ Dashboard - Crime Investigation System
 
 
         <!-- Investigation Management -->
+
         <div class="col-md-6 col-lg-4">
 
-            <div class="card h-100 shadow-sm border-0">
+            <div class="card border-0 shadow-sm h-100">
 
-                <div class="card-body">
+                <div class="card-body p-4">
 
-                    <h4 class="card-title">
-                        🕵️ Investigation Management
+                    <div class="fs-2 mb-3">
+                        🕵️
+                    </div>
+
+                    <h4 class="fw-bold">
+                        Investigation Management
                     </h4>
 
                     <p class="text-muted">
@@ -308,7 +460,7 @@ Dashboard - Crime Investigation System
                         href="/investigations"
                         class="btn btn-dark"
                     >
-                        Manage Investigations
+                        Manage Investigations →
                     </a>
 
                 </div>
@@ -319,14 +471,19 @@ Dashboard - Crime Investigation System
 
 
         <!-- Complaint Management -->
+
         <div class="col-md-6 col-lg-4">
 
-            <div class="card h-100 shadow-sm border-0">
+            <div class="card border-0 shadow-sm h-100">
 
-                <div class="card-body">
+                <div class="card-body p-4">
 
-                    <h4 class="card-title">
-                        📢 Complaint Management
+                    <div class="fs-2 mb-3">
+                        📢
+                    </div>
+
+                    <h4 class="fw-bold">
+                        Complaint Management
                     </h4>
 
                     <p class="text-muted">
@@ -337,7 +494,7 @@ Dashboard - Crime Investigation System
                         href="/admin/complaints"
                         class="btn btn-dark"
                     >
-                        Manage Complaints
+                        Manage Complaints →
                     </a>
 
                 </div>
@@ -348,14 +505,19 @@ Dashboard - Crime Investigation System
 
 
         <!-- Reports -->
+
         <div class="col-md-6 col-lg-4">
 
-            <div class="card h-100 shadow-sm border-0">
+            <div class="card border-0 shadow-sm h-100">
 
-                <div class="card-body">
+                <div class="card-body p-4">
 
-                    <h4 class="card-title">
-                        📊 Reports
+                    <div class="fs-2 mb-3">
+                        📊
+                    </div>
+
+                    <h4 class="fw-bold">
+                        Reports
                     </h4>
 
                     <p class="text-muted">
@@ -366,7 +528,7 @@ Dashboard - Crime Investigation System
                         href="/reports"
                         class="btn btn-dark"
                     >
-                        View Reports
+                        View Reports →
                     </a>
 
                 </div>
@@ -378,21 +540,43 @@ Dashboard - Crime Investigation System
     </div>
 
 
-    <!-- CITIZEN DASHBOARD -->
+    <!-- =========================
+         CITIZEN DASHBOARD
+    ========================== -->
 
     {% else %}
 
+
+    <div class="mb-4">
+
+        <h3 class="fw-bold">
+            Citizen Services
+        </h3>
+
+        <p class="text-muted">
+            Submit and track your crime complaints.
+        </p>
+
+    </div>
+
+
     <div class="row g-4">
 
+
         <!-- Report Crime -->
+
         <div class="col-md-6 col-lg-4">
 
-            <div class="card h-100 shadow-sm border-0">
+            <div class="card border-0 shadow-sm h-100">
 
-                <div class="card-body">
+                <div class="card-body p-4">
 
-                    <h4 class="card-title">
-                        📢 Report Crime
+                    <div class="fs-2 mb-3">
+                        📢
+                    </div>
+
+                    <h4 class="fw-bold">
+                        Report Crime
                     </h4>
 
                     <p class="text-muted">
@@ -403,7 +587,7 @@ Dashboard - Crime Investigation System
                         href="/complaint"
                         class="btn btn-dark"
                     >
-                        Report Crime
+                        Report Crime →
                     </a>
 
                 </div>
@@ -414,14 +598,19 @@ Dashboard - Crime Investigation System
 
 
         <!-- Complaint Status -->
+
         <div class="col-md-6 col-lg-4">
 
-            <div class="card h-100 shadow-sm border-0">
+            <div class="card border-0 shadow-sm h-100">
 
-                <div class="card-body">
+                <div class="card-body p-4">
 
-                    <h4 class="card-title">
-                        📋 Complaint Status
+                    <div class="fs-2 mb-3">
+                        📋
+                    </div>
+
+                    <h4 class="fw-bold">
+                        Complaint Status
                     </h4>
 
                     <p class="text-muted">
@@ -432,7 +621,7 @@ Dashboard - Crime Investigation System
                         href="/complaints"
                         class="btn btn-dark"
                     >
-                        Check Status
+                        Check Status →
                     </a>
 
                 </div>
@@ -442,6 +631,7 @@ Dashboard - Crime Investigation System
         </div>
 
     </div>
+
 
     {% endif %}
 

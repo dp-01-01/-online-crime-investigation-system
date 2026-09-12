@@ -11,11 +11,9 @@
     >
 
     <title>
-
         {% block title %}
         Online Crime Investigation System
         {% endblock %}
-
     </title>
 
 
@@ -44,7 +42,7 @@
          NAVIGATION BAR
     ========================== -->
 
-    <nav class="navbar navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
 
         <div class="container">
 
@@ -52,94 +50,118 @@
             <!-- Website Name -->
 
             <a
-                class="navbar-brand"
+                class="navbar-brand fw-bold"
                 href="/"
             >
-                Crime Investigation System
+                🔎 Crime Investigation System
             </a>
 
 
-            <!-- Navigation Links -->
+            <!-- Mobile Menu Button -->
 
-            <div>
+            <button
+                class="navbar-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#mainNavbar"
+                aria-controls="mainNavbar"
+                aria-expanded="false"
+                aria-label="Toggle navigation"
+            >
+
+                <span class="navbar-toggler-icon"></span>
+
+            </button>
 
 
-                <!-- Home -->
+            <!-- Navigation Content -->
 
-                <a
-                    href="/"
-                    class="btn btn-outline-light btn-sm"
-                >
-                    Home
-                </a>
+            <div
+                class="collapse navbar-collapse"
+                id="mainNavbar"
+            >
 
-
-                {% if session.get("user_id") %}
+                <div class="ms-auto d-flex flex-column flex-lg-row align-items-lg-center gap-2 mt-3 mt-lg-0">
 
 
-                    <!-- Dashboard -->
+                    <!-- Home -->
 
                     <a
-                        href="/dashboard"
+                        href="/"
                         class="btn btn-outline-light btn-sm"
                     >
-                        Dashboard
+                        Home
                     </a>
 
 
-                    <!-- Username -->
-
-                    <span
-                        class="text-white ms-2 me-2"
-                    >
-                        {{ session.get("username") }}
-                    </span>
+                    {% if session.get("user_id") %}
 
 
-                    <!-- Role -->
+                        <!-- Dashboard -->
 
-                    <span
-                        class="badge bg-secondary me-2"
-                    >
-                        {{ session.get("role") }}
-                    </span>
-
-
-                    <!-- Logout -->
-
-                    <a
-                        href="/logout"
-                        class="btn btn-danger btn-sm"
-                    >
-                        Logout
-                    </a>
+                        <a
+                            href="/dashboard"
+                            class="btn btn-outline-light btn-sm"
+                        >
+                            Dashboard
+                        </a>
 
 
-                {% else %}
+                        <!-- User Information -->
+
+                        <span class="text-white ms-lg-2">
+
+                            👤 {{ session.get("username") }}
+
+                        </span>
 
 
-                    <!-- Login -->
+                        <!-- Role -->
 
-                    <a
-                        href="/login"
-                        class="btn btn-light btn-sm"
-                    >
-                        Login
-                    </a>
+                        <span class="badge bg-secondary">
 
+                            {{ session.get("role")|title }}
 
-                    <!-- Register -->
-
-                    <a
-                        href="/register"
-                        class="btn btn-outline-light btn-sm"
-                    >
-                        Register
-                    </a>
+                        </span>
 
 
-                {% endif %}
+                        <!-- Logout -->
 
+                        <a
+                            href="/logout"
+                            class="btn btn-danger btn-sm"
+                        >
+                            Logout
+                        </a>
+
+
+                    {% else %}
+
+
+                        <!-- Login -->
+
+                        <a
+                            href="/login"
+                            class="btn btn-light btn-sm"
+                        >
+                            Login
+                        </a>
+
+
+                        <!-- Register -->
+
+                        <a
+                            href="/register"
+                            class="btn btn-outline-light btn-sm"
+                        >
+                            Register
+                        </a>
+
+
+                    {% endif %}
+
+
+                </div>
 
             </div>
 
