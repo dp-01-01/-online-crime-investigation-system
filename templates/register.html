@@ -6,31 +6,43 @@ Register - Crime Investigation System
 
 {% block content %}
 
-<div class="container mt-5">
+<div class="container py-5">
 
     <div class="row justify-content-center">
 
-        <div class="col-md-6">
+        <div class="col-md-6 col-lg-5">
 
-            <div class="card shadow">
+            <div class="card border-0 shadow-sm">
 
-                <div class="card-body">
+                <div class="card-body p-4">
 
-                    <h2 class="text-center mb-4">
-                        User Registration
-                    </h2>
+                    <!-- Page Heading -->
+
+                    <div class="text-center mb-4">
+
+                        <span class="badge bg-dark mb-2">
+                            Crime Investigation System
+                        </span>
+
+                        <h2 class="fw-bold">
+                            Create Account
+                        </h2>
+
+                        <p class="text-muted mb-0">
+                            Register as a citizen to use the system.
+                        </p>
+
+                    </div>
 
 
                     <form method="POST">
 
 
-                        <!-- =========================
-                             USERNAME
-                        ========================== -->
+                        <!-- USERNAME -->
 
                         <div class="mb-3">
 
-                            <label class="form-label">
+                            <label class="form-label fw-semibold">
                                 Username
                             </label>
 
@@ -45,13 +57,11 @@ Register - Crime Investigation System
                         </div>
 
 
-                        <!-- =========================
-                             EMAIL
-                        ========================== -->
+                        <!-- EMAIL -->
 
                         <div class="mb-3">
 
-                            <label class="form-label">
+                            <label class="form-label fw-semibold">
                                 Email
                             </label>
 
@@ -66,13 +76,11 @@ Register - Crime Investigation System
                         </div>
 
 
-                        <!-- =========================
-                             PASSWORD
-                        ========================== -->
+                        <!-- PASSWORD -->
 
                         <div class="mb-3">
 
-                            <label class="form-label">
+                            <label class="form-label fw-semibold">
                                 Password
                             </label>
 
@@ -81,74 +89,75 @@ Register - Crime Investigation System
                                 name="password"
                                 class="form-control"
                                 placeholder="Enter password"
+                                minlength="6"
                                 required
                             >
+
+                            <div class="form-text">
+                                Password must contain at least 6 characters.
+                            </div>
 
                         </div>
 
 
-                        <!-- =========================
-                             ROLE
-                        ========================== -->
+                        <!-- ROLE -->
 
-                        <div class="mb-3">
+                        <div class="mb-4">
 
-                            <label class="form-label">
-                                Role
+                            <label class="form-label fw-semibold">
+                                Account Type
                             </label>
 
-                            <select
-                                name="role"
+                            <input
+                                type="text"
                                 class="form-control"
-                                required
+                                value="Citizen"
+                                readonly
                             >
 
-                                <option value="citizen">
-                                    Citizen
-                                </option>
+                            <!--
+                                The role is fixed as citizen.
+                                Admin and Investigator accounts
+                                should not be created through
+                                public registration.
+                            -->
 
-                                <option value="investigator">
-                                    Investigator
-                                </option>
-
-                                <option value="admin">
-                                    Admin
-                                </option>
-
-                            </select>
+                            <input
+                                type="hidden"
+                                name="role"
+                                value="citizen"
+                            >
 
                         </div>
 
 
-                        <!-- =========================
-                             REGISTER BUTTON
-                        ========================== -->
+                        <!-- REGISTER BUTTON -->
 
                         <button
                             type="submit"
                             class="btn btn-dark w-100"
                         >
-                            Register
+                            Create Account
                         </button>
 
 
                     </form>
 
 
-                    <!-- =========================
-                         LOGIN LINK
-                    ========================== -->
+                    <!-- LOGIN LINK -->
 
-                    <p class="text-center mt-3">
+                    <p class="text-center mt-4 mb-0">
 
                         Already have an account?
 
-                        <a href="/login">
+                        <a
+                            href="/login"
+                            class="fw-semibold text-dark"
+                        >
                             Login
                         </a>
 
                     </p>
-
 
                 </div>
 

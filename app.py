@@ -141,7 +141,10 @@ def register():
         username = request.form["username"]
         email = request.form["email"]
         password = request.form["password"]
-        role = request.form["role"]
+
+        # Public registration is always for citizens.
+        # Do not trust the role sent by the browser.
+        role = "citizen"
 
         hashed_password = generate_password_hash(password)
 
@@ -186,7 +189,6 @@ def register():
         return redirect(url_for("login"))
 
     return render_template("register.html")
-
 
 # =========================
 # DASHBOARD PAGE
