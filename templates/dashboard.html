@@ -6,40 +6,40 @@ Dashboard - Crime Investigation System
 
 {% block content %}
 
-<div class="container mt-5">
+<div class="container py-5">
 
-    <div class="text-center mb-5">
+    <!-- Dashboard Header -->
+    <div class="mb-5">
 
-        <h1>
-            Crime Investigation Dashboard
+        <h1 class="fw-bold">
+            Welcome, {{ session.get("username") }}
         </h1>
 
         <p class="text-muted">
-            Welcome, {{ session.get("username") }}
+            Online Crime Investigation System Dashboard
         </p>
 
         <span class="badge bg-dark">
-            Role: {{ session.get("role") }}
+            Role: {{ session.get("role")|title }}
         </span>
 
     </div>
 
 
-    <!-- Admin / Investigator -->
+    <!-- Admin / Investigator Dashboard -->
     {% if session.get("role") in ["admin", "investigator"] %}
 
     <div class="row g-4">
 
-
         <!-- Cases -->
-        <div class="col-md-4">
+        <div class="col-md-6 col-lg-4">
 
-            <div class="card shadow h-100">
+            <div class="card h-100 shadow-sm border-0">
 
-                <div class="card-body text-center">
+                <div class="card-body">
 
-                    <h4>
-                        Case Management
+                    <h4 class="card-title">
+                        📁 Case Management
                     </h4>
 
                     <p class="text-muted">
@@ -61,18 +61,18 @@ Dashboard - Crime Investigation System
 
 
         <!-- Victims -->
-        <div class="col-md-4">
+        <div class="col-md-6 col-lg-4">
 
-            <div class="card shadow h-100">
+            <div class="card h-100 shadow-sm border-0">
 
-                <div class="card-body text-center">
+                <div class="card-body">
 
-                    <h4>
-                        Victim Management
+                    <h4 class="card-title">
+                        👤 Victim Management
                     </h4>
 
                     <p class="text-muted">
-                        Manage information related to victims.
+                        Manage victim information and case details.
                     </p>
 
                     <a
@@ -90,18 +90,18 @@ Dashboard - Crime Investigation System
 
 
         <!-- Suspects -->
-        <div class="col-md-4">
+        <div class="col-md-6 col-lg-4">
 
-            <div class="card shadow h-100">
+            <div class="card h-100 shadow-sm border-0">
 
-                <div class="card-body text-center">
+                <div class="card-body">
 
-                    <h4>
-                        Suspect Management
+                    <h4 class="card-title">
+                        🔎 Suspect Management
                     </h4>
 
                     <p class="text-muted">
-                        Manage suspect information and status.
+                        Manage suspect records and investigation status.
                     </p>
 
                     <a
@@ -119,18 +119,18 @@ Dashboard - Crime Investigation System
 
 
         <!-- Evidence -->
-        <div class="col-md-4">
+        <div class="col-md-6 col-lg-4">
 
-            <div class="card shadow h-100">
+            <div class="card h-100 shadow-sm border-0">
 
-                <div class="card-body text-center">
+                <div class="card-body">
 
-                    <h4>
-                        Evidence Management
+                    <h4 class="card-title">
+                        🧾 Evidence Management
                     </h4>
 
                     <p class="text-muted">
-                        Manage evidence collected during investigations.
+                        Record and manage evidence collected during cases.
                     </p>
 
                     <a
@@ -148,18 +148,18 @@ Dashboard - Crime Investigation System
 
 
         <!-- Investigations -->
-        <div class="col-md-4">
+        <div class="col-md-6 col-lg-4">
 
-            <div class="card shadow h-100">
+            <div class="card h-100 shadow-sm border-0">
 
-                <div class="card-body text-center">
+                <div class="card-body">
 
-                    <h4>
-                        Investigation Management
+                    <h4 class="card-title">
+                        🕵️ Investigation Management
                     </h4>
 
                     <p class="text-muted">
-                        Manage investigation activities and findings.
+                        Record investigation activities and findings.
                     </p>
 
                     <a
@@ -177,18 +177,18 @@ Dashboard - Crime Investigation System
 
 
         <!-- Complaints -->
-        <div class="col-md-4">
+        <div class="col-md-6 col-lg-4">
 
-            <div class="card shadow h-100">
+            <div class="card h-100 shadow-sm border-0">
 
-                <div class="card-body text-center">
+                <div class="card-body">
 
-                    <h4>
-                        Complaint Management
+                    <h4 class="card-title">
+                        📢 Complaint Management
                     </h4>
 
                     <p class="text-muted">
-                        Review citizen complaints and update their status.
+                        Review and update citizen crime complaints.
                     </p>
 
                     <a
@@ -206,14 +206,14 @@ Dashboard - Crime Investigation System
 
 
         <!-- Reports -->
-        <div class="col-md-4">
+        <div class="col-md-6 col-lg-4">
 
-            <div class="card shadow h-100">
+            <div class="card h-100 shadow-sm border-0">
 
-                <div class="card-body text-center">
+                <div class="card-body">
 
-                    <h4>
-                        Reports
+                    <h4 class="card-title">
+                        📊 Reports
                     </h4>
 
                     <p class="text-muted">
@@ -235,28 +235,27 @@ Dashboard - Crime Investigation System
 
     </div>
 
-    {% endif %}
+
+    {% else %}
 
 
-    <!-- Citizen -->
-    {% if session.get("role") == "citizen" %}
+    <!-- Citizen Dashboard -->
 
-    <div class="row justify-content-center g-4">
-
+    <div class="row g-4">
 
         <!-- Report Crime -->
-        <div class="col-md-5">
+        <div class="col-md-6 col-lg-4">
 
-            <div class="card shadow h-100">
+            <div class="card h-100 shadow-sm border-0">
 
-                <div class="card-body text-center">
+                <div class="card-body">
 
-                    <h4>
-                        Report Crime
+                    <h4 class="card-title">
+                        📢 Report Crime
                     </h4>
 
                     <p class="text-muted">
-                        Submit a new crime complaint.
+                        Submit a new crime complaint to the authorities.
                     </p>
 
                     <a
@@ -274,14 +273,14 @@ Dashboard - Crime Investigation System
 
 
         <!-- Complaint Status -->
-        <div class="col-md-5">
+        <div class="col-md-6 col-lg-4">
 
-            <div class="card shadow h-100">
+            <div class="card h-100 shadow-sm border-0">
 
-                <div class="card-body text-center">
+                <div class="card-body">
 
-                    <h4>
-                        Complaint Status
+                    <h4 class="card-title">
+                        📋 Complaint Status
                     </h4>
 
                     <p class="text-muted">
@@ -292,7 +291,7 @@ Dashboard - Crime Investigation System
                         href="/complaints"
                         class="btn btn-dark"
                     >
-                        View Complaints
+                        Check Status
                     </a>
 
                 </div>
@@ -304,18 +303,6 @@ Dashboard - Crime Investigation System
     </div>
 
     {% endif %}
-
-
-    <div class="text-center mt-5">
-
-        <a
-            href="/logout"
-            class="btn btn-danger"
-        >
-            Logout
-        </a>
-
-    </div>
 
 </div>
 
