@@ -1,0 +1,246 @@
+{% extends "base.html" %}
+
+{% block title %}
+Edit Suspect - Crime Investigation System
+{% endblock %}
+
+{% block content %}
+
+<div class="container mt-5">
+
+    <div class="row justify-content-center">
+
+        <div class="col-md-8">
+
+            <div class="card shadow">
+
+                <div class="card-body">
+
+                    <h2 class="text-center mb-4">
+                        Edit Suspect
+                    </h2>
+
+                    <form method="POST">
+
+                        <!-- Case Number -->
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Case Number
+                            </label>
+
+                            <input
+                                type="text"
+                                name="case_number"
+                                class="form-control"
+                                value="{{ suspect.case_number }}"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- Name -->
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Suspect Name
+                            </label>
+
+                            <input
+                                type="text"
+                                name="name"
+                                class="form-control"
+                                value="{{ suspect.name }}"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- Age -->
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Age
+                            </label>
+
+                            <input
+                                type="number"
+                                name="age"
+                                class="form-control"
+                                value="{{ suspect.age or '' }}"
+                            >
+
+                        </div>
+
+
+                        <!-- Gender -->
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Gender
+                            </label>
+
+                            <select
+                                name="gender"
+                                class="form-control"
+                            >
+
+                                <option value="">
+                                    Select Gender
+                                </option>
+
+                                <option
+                                    value="Male"
+                                    {% if suspect.gender == "Male" %}selected{% endif %}
+                                >
+                                    Male
+                                </option>
+
+                                <option
+                                    value="Female"
+                                    {% if suspect.gender == "Female" %}selected{% endif %}
+                                >
+                                    Female
+                                </option>
+
+                                <option
+                                    value="Other"
+                                    {% if suspect.gender == "Other" %}selected{% endif %}
+                                >
+                                    Other
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- Phone -->
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Phone
+                            </label>
+
+                            <input
+                                type="text"
+                                name="phone"
+                                class="form-control"
+                                value="{{ suspect.phone or '' }}"
+                            >
+
+                        </div>
+
+
+                        <!-- Address -->
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Address
+                            </label>
+
+                            <textarea
+                                name="address"
+                                class="form-control"
+                                rows="3"
+                            >{{ suspect.address or '' }}</textarea>
+
+                        </div>
+
+
+                        <!-- Description -->
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Description
+                            </label>
+
+                            <textarea
+                                name="description"
+                                class="form-control"
+                                rows="5"
+                            >{{ suspect.description or '' }}</textarea>
+
+                        </div>
+
+
+                        <!-- Status -->
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Status
+                            </label>
+
+                            <select
+                                name="status"
+                                class="form-control"
+                                required
+                            >
+
+                                <option
+                                    value="Under Investigation"
+                                    {% if suspect.status == "Under Investigation" %}selected{% endif %}
+                                >
+                                    Under Investigation
+                                </option>
+
+                                <option
+                                    value="Cleared"
+                                    {% if suspect.status == "Cleared" %}selected{% endif %}
+                                >
+                                    Cleared
+                                </option>
+
+                                <option
+                                    value="Arrested"
+                                    {% if suspect.status == "Arrested" %}selected{% endif %}
+                                >
+                                    Arrested
+                                </option>
+
+                                <option
+                                    value="Released"
+                                    {% if suspect.status == "Released" %}selected{% endif %}
+                                >
+                                    Released
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- Buttons -->
+                        <div class="d-flex gap-2">
+
+                            <button
+                                type="submit"
+                                class="btn btn-dark"
+                            >
+                                Update Suspect
+                            </button>
+
+                            <a
+                                href="/suspects"
+                                class="btn btn-outline-secondary"
+                            >
+                                Cancel
+                            </a>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

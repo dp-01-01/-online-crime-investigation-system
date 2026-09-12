@@ -11,11 +11,9 @@ Investigation Management - Crime Investigation System
     <h1>Investigation Management</h1>
 
     <p class="text-muted">
-        Manage investigation details related to crime cases.
+        Manage investigation activities and findings for crime cases.
     </p>
 
-
-    <!-- Buttons -->
     <div class="mt-4">
 
         <a
@@ -35,7 +33,6 @@ Investigation Management - Crime Investigation System
     </div>
 
 
-    <!-- Investigation Table -->
     <div class="card shadow mt-4">
 
         <div class="card-body">
@@ -49,6 +46,7 @@ Investigation Management - Crime Investigation System
                     <thead class="table-dark">
 
                         <tr>
+
                             <th>ID</th>
                             <th>Case Number</th>
                             <th>Investigator</th>
@@ -57,9 +55,12 @@ Investigation Management - Crime Investigation System
                             <th>Details</th>
                             <th>Findings</th>
                             <th>Status</th>
+                            <th>Action</th>
+
                         </tr>
 
                     </thead>
+
 
                     <tbody>
 
@@ -80,33 +81,88 @@ Investigation Management - Crime Investigation System
                             </td>
 
                             <td>
-                                {{ investigation.investigation_date }}
+                                {{ investigation.investigation_date or '-' }}
                             </td>
 
                             <td>
-                                {{ investigation.investigation_type }}
+                                {{ investigation.investigation_type or '-' }}
                             </td>
 
                             <td>
-                                {{ investigation.details }}
+                                {{ investigation.details or '-' }}
                             </td>
 
                             <td>
-                                {{ investigation.findings }}
+                                {{ investigation.findings or '-' }}
                             </td>
 
                             <td>
-                                {{ investigation.status }}
+
+                                {% if investigation.status == "Completed" %}
+
+                                    <span class="badge bg-success">
+                                        Completed
+                                    </span>
+
+                                {% elif investigation.status == "Closed" %}
+
+                                    <span class="badge bg-secondary">
+                                        Closed
+                                    </span>
+
+                                {% elif investigation.status == "Pending" %}
+
+                                    <span class="badge bg-warning text-dark">
+                                        Pending
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="badge bg-primary">
+                                        {{ investigation.status }}
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <td>
+
+                                <a
+                                    href="{{ url_for('edit_investigation', investigation_id=investigation.id) }}"
+                                    class="btn btn-sm btn-primary"
+                                >
+                                    Edit
+                                </a>
+
+                                <form
+                                    action="{{ url_for('delete_investigation', investigation_id=investigation.id) }}"
+                                    method="POST"
+                                    style="display: inline;"
+                                    onsubmit="return confirm('Are you sure you want to delete this investigation?');"
+                                >
+
+                                    <button
+                                        type="submit"
+                                        class="btn btn-sm btn-danger"
+                                    >
+                                        Delete
+                                    </button>
+
+                                </form>
+
                             </td>
 
                         </tr>
+
 
                         {% else %}
 
                         <tr>
 
                             <td
-                                colspan="8"
+                                colspan="9"
                                 class="text-center"
                             >
                                 No investigations found.

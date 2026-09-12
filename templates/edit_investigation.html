@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+
+{% block title %}
+Edit Investigation - Crime Investigation System
+{% endblock %}
+
+{% block content %}
+
+<div class="container mt-5">
+
+    <div class="row justify-content-center">
+
+        <div class="col-md-8">
+
+            <div class="card shadow">
+
+                <div class="card-body">
+
+                    <h2 class="text-center mb-4">
+                        Edit Investigation
+                    </h2>
+
+                    <form method="POST">
+
+                        <!-- Case Number -->
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Case Number
+                            </label>
+
+                            <input
+                                type="text"
+                                name="case_number"
+                                class="form-control"
+                                value="{{ investigation.case_number }}"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- Investigator -->
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Investigator
+                            </label>
+
+                            <input
+                                type="text"
+                                name="investigator"
+                                class="form-control"
+                                value="{{ investigation.investigator }}"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- Investigation Date -->
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Investigation Date
+                            </label>
+
+                            <input
+                                type="date"
+                                name="investigation_date"
+                                class="form-control"
+                                value="{{ investigation.investigation_date or '' }}"
+                            >
+
+                        </div>
+
+
+                        <!-- Investigation Type -->
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Investigation Type
+                            </label>
+
+                            <input
+                                type="text"
+                                name="investigation_type"
+                                class="form-control"
+                                value="{{ investigation.investigation_type or '' }}"
+                            >
+
+                        </div>
+
+
+                        <!-- Details -->
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Investigation Details
+                            </label>
+
+                            <textarea
+                                name="details"
+                                class="form-control"
+                                rows="5"
+                            >{{ investigation.details or '' }}</textarea>
+
+                        </div>
+
+
+                        <!-- Findings -->
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Findings
+                            </label>
+
+                            <textarea
+                                name="findings"
+                                class="form-control"
+                                rows="5"
+                            >{{ investigation.findings or '' }}</textarea>
+
+                        </div>
+
+
+                        <!-- Status -->
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Status
+                            </label>
+
+                            <select
+                                name="status"
+                                class="form-control"
+                                required
+                            >
+
+                                <option
+                                    value="In Progress"
+                                    {% if investigation.status == "In Progress" %}selected{% endif %}
+                                >
+                                    In Progress
+                                </option>
+
+                                <option
+                                    value="Completed"
+                                    {% if investigation.status == "Completed" %}selected{% endif %}
+                                >
+                                    Completed
+                                </option>
+
+                                <option
+                                    value="Pending"
+                                    {% if investigation.status == "Pending" %}selected{% endif %}
+                                >
+                                    Pending
+                                </option>
+
+                                <option
+                                    value="Closed"
+                                    {% if investigation.status == "Closed" %}selected{% endif %}
+                                >
+                                    Closed
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- Buttons -->
+                        <div class="d-flex gap-2">
+
+                            <button
+                                type="submit"
+                                class="btn btn-dark"
+                            >
+                                Update Investigation
+                            </button>
+
+                            <a
+                                href="/investigations"
+                                class="btn btn-outline-secondary"
+                            >
+                                Cancel
+                            </a>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

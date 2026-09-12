@@ -8,43 +8,214 @@ Dashboard - Crime Investigation System
 
 <div class="container mt-5">
 
-    <!-- Dashboard Heading -->
-    <h1 class="mb-4">
+    <!-- =========================
+         DASHBOARD HEADING
+    ========================== -->
+
+    <h1 class="mb-2">
         Crime Investigation Dashboard
     </h1>
 
     <p class="text-muted">
-        Welcome to the Online Crime Investigation System.
+        Welcome,
+        <strong>{{ session.get("username") }}</strong>.
+    </p>
+
+    <p>
+        Your Role:
+        <span class="badge bg-dark">
+            {{ session.get("role") }}
+        </span>
     </p>
 
 
-    <!-- Dashboard Cards -->
-    <div class="row mt-4">
+    <!-- =========================
+         ADMIN DASHBOARD
+    ========================== -->
+
+    {% if session.get("role") == "admin" %}
+
+        <h3 class="mt-4 mb-3">
+            Admin Panel
+        </h3>
+
+        <div class="row">
 
 
-        <!-- =========================
-             CASE MANAGEMENT
-        ========================== -->
-        <div class="col-md-4 mb-4">
+            <!-- CASE MANAGEMENT -->
 
-            <div class="card shadow h-100">
+            <div class="col-md-4 mb-4">
 
-                <div class="card-body">
+                <div class="card shadow h-100">
 
-                    <h4>
-                        Case Management
-                    </h4>
+                    <div class="card-body">
 
-                    <p>
-                        Manage and track crime cases.
-                    </p>
+                        <h4>
+                            Case Management
+                        </h4>
 
-                    <a
-                        href="/cases"
-                        class="btn btn-dark"
-                    >
-                        View Cases
-                    </a>
+                        <p>
+                            Manage and track crime cases.
+                        </p>
+
+                        <a
+                            href="/cases"
+                            class="btn btn-dark"
+                        >
+                            View Cases
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- VICTIMS -->
+
+            <div class="col-md-4 mb-4">
+
+                <div class="card shadow h-100">
+
+                    <div class="card-body">
+
+                        <h4>
+                            Victims
+                        </h4>
+
+                        <p>
+                            Manage victim information.
+                        </p>
+
+                        <a
+                            href="/victims"
+                            class="btn btn-dark"
+                        >
+                            View Victims
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- SUSPECTS -->
+
+            <div class="col-md-4 mb-4">
+
+                <div class="card shadow h-100">
+
+                    <div class="card-body">
+
+                        <h4>
+                            Suspects
+                        </h4>
+
+                        <p>
+                            Manage suspect information.
+                        </p>
+
+                        <a
+                            href="/suspects"
+                            class="btn btn-dark"
+                        >
+                            View Suspects
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- EVIDENCE -->
+
+            <div class="col-md-4 mb-4">
+
+                <div class="card shadow h-100">
+
+                    <div class="card-body">
+
+                        <h4>
+                            Evidence
+                        </h4>
+
+                        <p>
+                            Manage case evidence.
+                        </p>
+
+                        <a
+                            href="/evidence"
+                            class="btn btn-dark"
+                        >
+                            View Evidence
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- INVESTIGATIONS -->
+
+            <div class="col-md-4 mb-4">
+
+                <div class="card shadow h-100">
+
+                    <div class="card-body">
+
+                        <h4>
+                            Investigations
+                        </h4>
+
+                        <p>
+                            Record investigation details.
+                        </p>
+
+                        <a
+                            href="/investigations"
+                            class="btn btn-dark"
+                        >
+                            View Investigations
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- REPORTS -->
+
+            <div class="col-md-4 mb-4">
+
+                <div class="card shadow h-100">
+
+                    <div class="card-body">
+
+                        <h4>
+                            Reports
+                        </h4>
+
+                        <p>
+                            View crime investigation reports.
+                        </p>
+
+                        <a
+                            href="/reports"
+                            class="btn btn-dark"
+                        >
+                            View Reports
+                        </a>
+
+                    </div>
 
                 </div>
 
@@ -52,30 +223,196 @@ Dashboard - Crime Investigation System
 
         </div>
 
+    {% endif %}
 
-        <!-- =========================
-             VICTIMS
-        ========================== -->
-        <div class="col-md-4 mb-4">
 
-            <div class="card shadow h-100">
+    <!-- =========================
+         INVESTIGATOR DASHBOARD
+    ========================== -->
 
-                <div class="card-body">
+    {% if session.get("role") == "investigator" %}
 
-                    <h4>
-                        Victims
-                    </h4>
+        <h3 class="mt-4 mb-3">
+            Investigator Panel
+        </h3>
 
-                    <p>
-                        Manage victim information.
-                    </p>
+        <div class="row">
 
-                    <a
-                        href="/victims"
-                        class="btn btn-dark"
-                    >
-                        View Victims
-                    </a>
+
+            <!-- CASES -->
+
+            <div class="col-md-4 mb-4">
+
+                <div class="card shadow h-100">
+
+                    <div class="card-body">
+
+                        <h4>
+                            Cases
+                        </h4>
+
+                        <p>
+                            View and manage assigned crime cases.
+                        </p>
+
+                        <a
+                            href="/cases"
+                            class="btn btn-dark"
+                        >
+                            View Cases
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- VICTIMS -->
+
+            <div class="col-md-4 mb-4">
+
+                <div class="card shadow h-100">
+
+                    <div class="card-body">
+
+                        <h4>
+                            Victims
+                        </h4>
+
+                        <p>
+                            View and manage victim information.
+                        </p>
+
+                        <a
+                            href="/victims"
+                            class="btn btn-dark"
+                        >
+                            View Victims
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- SUSPECTS -->
+
+            <div class="col-md-4 mb-4">
+
+                <div class="card shadow h-100">
+
+                    <div class="card-body">
+
+                        <h4>
+                            Suspects
+                        </h4>
+
+                        <p>
+                            View and manage suspect information.
+                        </p>
+
+                        <a
+                            href="/suspects"
+                            class="btn btn-dark"
+                        >
+                            View Suspects
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- EVIDENCE -->
+
+            <div class="col-md-4 mb-4">
+
+                <div class="card shadow h-100">
+
+                    <div class="card-body">
+
+                        <h4>
+                            Evidence
+                        </h4>
+
+                        <p>
+                            Manage evidence collected during investigation.
+                        </p>
+
+                        <a
+                            href="/evidence"
+                            class="btn btn-dark"
+                        >
+                            View Evidence
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- INVESTIGATION -->
+
+            <div class="col-md-4 mb-4">
+
+                <div class="card shadow h-100">
+
+                    <div class="card-body">
+
+                        <h4>
+                            Investigation
+                        </h4>
+
+                        <p>
+                            Record investigation activities and findings.
+                        </p>
+
+                        <a
+                            href="/investigations"
+                            class="btn btn-dark"
+                        >
+                            View Investigations
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- REPORTS -->
+
+            <div class="col-md-4 mb-4">
+
+                <div class="card shadow h-100">
+
+                    <div class="card-body">
+
+                        <h4>
+                            Reports
+                        </h4>
+
+                        <p>
+                            View investigation reports and statistics.
+                        </p>
+
+                        <a
+                            href="/reports"
+                            class="btn btn-dark"
+                        >
+                            View Reports
+                        </a>
+
+                    </div>
 
                 </div>
 
@@ -83,30 +420,78 @@ Dashboard - Crime Investigation System
 
         </div>
 
+    {% endif %}
 
-        <!-- =========================
-             SUSPECTS
-        ========================== -->
-        <div class="col-md-4 mb-4">
 
-            <div class="card shadow h-100">
+    <!-- =========================
+         CITIZEN DASHBOARD
+    ========================== -->
 
-                <div class="card-body">
+    {% if session.get("role") == "citizen" %}
 
-                    <h4>
-                        Suspects
-                    </h4>
+        <h3 class="mt-4 mb-3">
+            Citizen Panel
+        </h3>
 
-                    <p>
-                        Manage suspect information.
-                    </p>
+        <div class="row">
 
-                    <a
-                        href="/suspects"
-                        class="btn btn-dark"
-                    >
-                        View Suspects
-                    </a>
+
+            <!-- REPORT CRIME -->
+
+            <div class="col-md-6 mb-4">
+
+                <div class="card shadow h-100">
+
+                    <div class="card-body">
+
+                        <h4>
+                            Report a Crime
+                        </h4>
+
+                        <p>
+                            Submit a crime complaint to the
+                            investigation department.
+                        </p>
+
+                        <a
+                            href="/complaint"
+                            class="btn btn-dark"
+                        >
+                            Report Crime
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- COMPLAINT STATUS -->
+
+            <div class="col-md-6 mb-4">
+
+                <div class="card shadow h-100">
+
+                    <div class="card-body">
+
+                        <h4>
+                            Complaint Status
+                        </h4>
+
+                        <p>
+                            Check the status of your submitted
+                            crime complaints.
+                        </p>
+
+                        <a
+                            href="/complaints"
+                            class="btn btn-dark"
+                        >
+                            View Complaints
+                        </a>
+
+                    </div>
 
                 </div>
 
@@ -114,101 +499,8 @@ Dashboard - Crime Investigation System
 
         </div>
 
+    {% endif %}
 
-        <!-- =========================
-             EVIDENCE
-        ========================== -->
-        <div class="col-md-4 mb-4">
-
-            <div class="card shadow h-100">
-
-                <div class="card-body">
-
-                    <h4>
-                        Evidence
-                    </h4>
-
-                    <p>
-                        Manage case evidence.
-                    </p>
-
-                    <a
-                        href="/evidence"
-                        class="btn btn-dark"
-                    >
-                        View Evidence
-                    </a>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- =========================
-             INVESTIGATION
-        ========================== -->
-        <div class="col-md-4 mb-4">
-
-            <div class="card shadow h-100">
-
-                <div class="card-body">
-
-                    <h4>
-                        Investigation
-                    </h4>
-
-                    <p>
-                        Record investigation details.
-                    </p>
-
-                    <a
-                        href="/investigations"
-                        class="btn btn-dark"
-                    >
-                        View Investigation
-                    </a>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- =========================
-             REPORTS
-        ========================== -->
-        <div class="col-md-4 mb-4">
-
-            <div class="card shadow h-100">
-
-                <div class="card-body">
-
-                    <h4>
-                        Reports
-                    </h4>
-
-                    <p>
-                        View crime investigation reports.
-                    </p>
-
-                    <a
-                        href="/reports"
-                        class="btn btn-dark"
-                    >
-                        View Reports
-                    </a>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-    </div>
 
 </div>
 

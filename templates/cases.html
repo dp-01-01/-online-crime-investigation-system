@@ -8,71 +8,333 @@ Case Management - Crime Investigation System
 
 <div class="container mt-5">
 
-    <h1>Case Management</h1>
+    <!-- Page Heading -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
 
-    <p class="text-muted">
-        Manage and track crime investigation cases.
-    </p>
+        <h2>
+            Case Management
+        </h2>
 
-    <div class="mt-4">
-
-        <a href="/add-case" class="btn btn-dark">
-            Add New Case
-        </a>
-
-        <a href="/dashboard" class="btn btn-outline-dark">
-            Back to Dashboard
+        <a
+            href="/add-case"
+            class="btn btn-dark"
+        >
+            + Add New Case
         </a>
 
     </div>
 
-    <div class="card shadow mt-4">
+
+    <!-- Search and Filter -->
+    <div class="card shadow mb-4">
 
         <div class="card-body">
 
-            <h4>All Cases</h4>
+            <form
+                method="GET"
+                action="/cases"
+            >
 
-            <table class="table table-bordered mt-3">
+                <div class="row g-3">
 
-                <thead class="table-dark">
-                    <tr>
-                        <th>Case Number</th>
-                        <th>Crime Type</th>
-                        <th>Location</th>
-                        <th>Date</th>
-                        <th>Status</th>
-                        <th>Investigator</th>
-                    </tr>
-                </thead>
+                    <!-- Search -->
+                    <div class="col-md-6">
 
-                <tbody>
+                        <label class="form-label">
+                            Search Cases
+                        </label>
 
-                    {% for case in cases %}
+                        <input
+                            type="text"
+                            name="search"
+                            class="form-control"
+                            placeholder="Search case number, crime, location or investigator"
+                            value="{{ search or '' }}"
+                        >
 
-                    <tr>
-                        <td>{{ case.case_number }}</td>
-                        <td>{{ case.crime_type }}</td>
-                        <td>{{ case.location }}</td>
-                        <td>{{ case.incident_date }}</td>
-                        <td>{{ case.status }}</td>
-                        <td>{{ case.investigator }}</td>
-                    </tr>
+                    </div>
 
-                    {% else %}
 
-                    <tr>
-                        <td colspan="6" class="text-center">
-                            No cases found.
-                        </td>
-                    </tr>
+                    <!-- Status Filter -->
+                    <div class="col-md-4">
 
-                    {% endfor %}
+                        <label class="form-label">
+                            Status
+                        </label>
 
-                </tbody>
+                        <select
+                            name="status"
+                            class="form-control"
+                        >
 
-            </table>
+                            <option value="">
+                                All Status
+                            </option>
+
+                            <option
+                                value="Open"
+                                {% if status == "Open" %}selected{% endif %}
+                            >
+                                Open
+                            </option>
+
+                            <option
+                                value="Closed"
+                                {% if status == "Closed" %}selected{% endif %}
+                            >
+                                Closed
+                            </option>
+
+                            <option
+                                value="Under Investigation"
+                                {% if status == "Under Investigation" %}selected{% endif %}
+                            >
+                                Under Investigation
+                            </option>
+
+                            <option
+                                value="Pending"
+                                {% if status == "Pending" %}selected{% endif %}
+                            >
+                                Pending
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- Buttons -->
+                    <div class="col-md-2 d-flex align-items-end">
+
+                        <button
+                            type="submit"
+                            class="btn btn-dark me-2"
+                        >
+                            Search
+                        </button>
+
+                        <a
+                            href="/cases"
+                            class="btn btn-outline-secondary"
+                        >
+                            Clear
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </form>
 
         </div>
+
+    </div>
+
+
+    <!-- Cases Table -->
+    <div class="card shadow">
+
+        <div class="card-body">
+
+            <h5 class="mb-3">
+                Cases
+            </h5>
+
+            <div class="table-responsive">
+
+                <table class="table table-bordered table-hover">
+
+                    <thead class="table-dark">
+
+                        <tr>
+
+                            <th>
+                                Case Number
+                            </th>
+
+                            <th>
+                                Crime Type
+                            </th>
+
+                            <th>
+                                Location
+                            </th>
+
+                            <th>
+                                Incident Date
+                            </th>
+
+                            <th>
+                                Description
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th>
+                                Investigator
+                            </th>
+
+                            <th>
+                                Action
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        {% for case in cases %}
+
+                        <tr>
+
+                            <!-- Case Number -->
+                            <td>
+                                {{ case.case_number }}
+                            </td>
+
+
+                            <!-- Crime Type -->
+                            <td>
+                                {{ case.crime_type }}
+                            </td>
+
+
+                            <!-- Location -->
+                            <td>
+                                {{ case.location }}
+                            </td>
+
+
+                            <!-- Incident Date -->
+                            <td>
+                                {{ case.incident_date }}
+                            </td>
+
+
+                            <!-- Description -->
+                            <td>
+                                {{ case.description }}
+                            </td>
+
+
+                            <!-- Status -->
+                            <td>
+
+                                {% if case.status == "Open" %}
+
+                                    <span class="badge bg-success">
+                                        Open
+                                    </span>
+
+                                {% elif case.status == "Closed" %}
+
+                                    <span class="badge bg-secondary">
+                                        Closed
+                                    </span>
+
+                                {% elif case.status == "Under Investigation" %}
+
+                                    <span class="badge bg-warning text-dark">
+                                        Under Investigation
+                                    </span>
+
+                                {% elif case.status == "Pending" %}
+
+                                    <span class="badge bg-info text-dark">
+                                        Pending
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="badge bg-secondary">
+                                        {{ case.status }}
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- Investigator -->
+                            <td>
+                                {{ case.investigator or "Not Assigned" }}
+                            </td>
+
+
+                            <!-- Action -->
+                            <td>
+
+                                <!-- Edit Button -->
+                                <a
+                                    href="{{ url_for('edit_case', case_id=case.id) }}"
+                                    class="btn btn-sm btn-primary"
+                                >
+                                    Edit
+                                </a>
+
+
+                                <!-- Delete Button -->
+                                <form
+                                    action="{{ url_for('delete_case', case_id=case.id) }}"
+                                    method="POST"
+                                    style="display: inline;"
+                                    onsubmit="return confirm('Are you sure you want to delete this case?');"
+                                >
+
+                                    <button
+                                        type="submit"
+                                        class="btn btn-sm btn-danger"
+                                    >
+                                        Delete
+                                    </button>
+
+                                </form>
+
+                            </td>
+
+                        </tr>
+
+
+                        {% else %}
+
+                        <tr>
+
+                            <td
+                                colspan="8"
+                                class="text-center text-muted"
+                            >
+                                No cases found.
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Back Button -->
+    <div class="mt-3">
+
+        <a
+            href="/dashboard"
+            class="btn btn-outline-dark"
+        >
+            Back to Dashboard
+        </a>
 
     </div>
 

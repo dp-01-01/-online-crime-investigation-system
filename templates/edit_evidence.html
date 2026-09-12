@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+
+{% block title %}
+Edit Evidence - Crime Investigation System
+{% endblock %}
+
+{% block content %}
+
+<div class="container mt-5">
+
+    <div class="row justify-content-center">
+
+        <div class="col-md-8">
+
+            <div class="card shadow">
+
+                <div class="card-body">
+
+                    <h2 class="text-center mb-4">
+                        Edit Evidence
+                    </h2>
+
+                    <form method="POST">
+
+                        <!-- Case Number -->
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Case Number
+                            </label>
+
+                            <input
+                                type="text"
+                                name="case_number"
+                                class="form-control"
+                                value="{{ evidence.case_number }}"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- Evidence Type -->
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Evidence Type
+                            </label>
+
+                            <input
+                                type="text"
+                                name="evidence_type"
+                                class="form-control"
+                                value="{{ evidence.evidence_type }}"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- Description -->
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Description
+                            </label>
+
+                            <textarea
+                                name="description"
+                                class="form-control"
+                                rows="4"
+                            >{{ evidence.description or '' }}</textarea>
+
+                        </div>
+
+
+                        <!-- Collected Date -->
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Collected Date
+                            </label>
+
+                            <input
+                                type="date"
+                                name="collected_date"
+                                class="form-control"
+                                value="{{ evidence.collected_date or '' }}"
+                            >
+
+                        </div>
+
+
+                        <!-- Collected By -->
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Collected By
+                            </label>
+
+                            <input
+                                type="text"
+                                name="collected_by"
+                                class="form-control"
+                                value="{{ evidence.collected_by or '' }}"
+                            >
+
+                        </div>
+
+
+                        <!-- Location Found -->
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Location Found
+                            </label>
+
+                            <input
+                                type="text"
+                                name="location_found"
+                                class="form-control"
+                                value="{{ evidence.location_found or '' }}"
+                            >
+
+                        </div>
+
+
+                        <!-- Status -->
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Status
+                            </label>
+
+                            <select
+                                name="status"
+                                class="form-control"
+                                required
+                            >
+
+                                <option
+                                    value="Collected"
+                                    {% if evidence.status == "Collected" %}selected{% endif %}
+                                >
+                                    Collected
+                                </option>
+
+                                <option
+                                    value="Under Examination"
+                                    {% if evidence.status == "Under Examination" %}selected{% endif %}
+                                >
+                                    Under Examination
+                                </option>
+
+                                <option
+                                    value="Verified"
+                                    {% if evidence.status == "Verified" %}selected{% endif %}
+                                >
+                                    Verified
+                                </option>
+
+                                <option
+                                    value="Submitted"
+                                    {% if evidence.status == "Submitted" %}selected{% endif %}
+                                >
+                                    Submitted
+                                </option>
+
+                                <option
+                                    value="Rejected"
+                                    {% if evidence.status == "Rejected" %}selected{% endif %}
+                                >
+                                    Rejected
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- Buttons -->
+                        <div class="d-flex gap-2">
+
+                            <button
+                                type="submit"
+                                class="btn btn-dark"
+                            >
+                                Update Evidence
+                            </button>
+
+                            <a
+                                href="/evidence"
+                                class="btn btn-outline-secondary"
+                            >
+                                Cancel
+                            </a>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

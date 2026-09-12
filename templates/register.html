@@ -20,9 +20,16 @@ Register - Crime Investigation System
                         User Registration
                     </h2>
 
+
                     <form method="POST">
 
+
+                        <!-- =========================
+                             USERNAME
+                        ========================== -->
+
                         <div class="mb-3">
+
                             <label class="form-label">
                                 Username
                             </label>
@@ -31,11 +38,19 @@ Register - Crime Investigation System
                                 type="text"
                                 name="username"
                                 class="form-control"
+                                placeholder="Enter username"
                                 required
                             >
+
                         </div>
 
+
+                        <!-- =========================
+                             EMAIL
+                        ========================== -->
+
                         <div class="mb-3">
+
                             <label class="form-label">
                                 Email
                             </label>
@@ -44,11 +59,19 @@ Register - Crime Investigation System
                                 type="email"
                                 name="email"
                                 class="form-control"
+                                placeholder="Enter email"
                                 required
                             >
+
                         </div>
 
+
+                        <!-- =========================
+                             PASSWORD
+                        ========================== -->
+
                         <div class="mb-3">
+
                             <label class="form-label">
                                 Password
                             </label>
@@ -57,16 +80,28 @@ Register - Crime Investigation System
                                 type="password"
                                 name="password"
                                 class="form-control"
+                                placeholder="Enter password"
                                 required
                             >
+
                         </div>
 
+
+                        <!-- =========================
+                             ROLE
+                        ========================== -->
+
                         <div class="mb-3">
+
                             <label class="form-label">
                                 Role
                             </label>
 
-                            <select name="role" class="form-control">
+                            <select
+                                name="role"
+                                class="form-control"
+                                required
+                            >
 
                                 <option value="citizen">
                                     Citizen
@@ -76,8 +111,18 @@ Register - Crime Investigation System
                                     Investigator
                                 </option>
 
+                                <option value="admin">
+                                    Admin
+                                </option>
+
                             </select>
+
                         </div>
+
+
+                        <!-- =========================
+                             REGISTER BUTTON
+                        ========================== -->
 
                         <button
                             type="submit"
@@ -86,7 +131,13 @@ Register - Crime Investigation System
                             Register
                         </button>
 
+
                     </form>
+
+
+                    <!-- =========================
+                         LOGIN LINK
+                    ========================== -->
 
                     <p class="text-center mt-3">
 
@@ -97,6 +148,7 @@ Register - Crime Investigation System
                         </a>
 
                     </p>
+
 
                 </div>
 

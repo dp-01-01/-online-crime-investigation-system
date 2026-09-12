@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% block title %}
+Edit Victim - Crime Investigation System
+{% endblock %}
+
+{% block content %}
+
+<div class="container mt-5">
+
+    <div class="row justify-content-center">
+
+        <div class="col-md-8">
+
+            <div class="card shadow">
+
+                <div class="card-body">
+
+                    <h2 class="text-center mb-4">
+                        Edit Victim
+                    </h2>
+
+                    <form method="POST">
+
+                        <!-- Case Number -->
+                        <div class="mb-3">
+                            <label class="form-label">
+                                Case Number
+                            </label>
+
+                            <input
+                                type="text"
+                                name="case_number"
+                                class="form-control"
+                                value="{{ victim.case_number }}"
+                                required
+                            >
+                        </div>
+
+
+                        <!-- Name -->
+                        <div class="mb-3">
+                            <label class="form-label">
+                                Victim Name
+                            </label>
+
+                            <input
+                                type="text"
+                                name="name"
+                                class="form-control"
+                                value="{{ victim.name }}"
+                                required
+                            >
+                        </div>
+
+
+                        <!-- Age -->
+                        <div class="mb-3">
+                            <label class="form-label">
+                                Age
+                            </label>
+
+                            <input
+                                type="number"
+                                name="age"
+                                class="form-control"
+                                value="{{ victim.age or '' }}"
+                            >
+                        </div>
+
+
+                        <!-- Gender -->
+                        <div class="mb-3">
+                            <label class="form-label">
+                                Gender
+                            </label>
+
+                            <select
+                                name="gender"
+                                class="form-control"
+                            >
+
+                                <option value="">
+                                    Select Gender
+                                </option>
+
+                                <option value="Male"
+                                    {% if victim.gender == "Male" %}selected{% endif %}>
+                                    Male
+                                </option>
+
+                                <option value="Female"
+                                    {% if victim.gender == "Female" %}selected{% endif %}>
+                                    Female
+                                </option>
+
+                                <option value="Other"
+                                    {% if victim.gender == "Other" %}selected{% endif %}>
+                                    Other
+                                </option>
+
+                            </select>
+                        </div>
+
+
+                        <!-- Phone -->
+                        <div class="mb-3">
+                            <label class="form-label">
+                                Phone
+                            </label>
+
+                            <input
+                                type="text"
+                                name="phone"
+                                class="form-control"
+                                value="{{ victim.phone or '' }}"
+                            >
+                        </div>
+
+
+                        <!-- Address -->
+                        <div class="mb-3">
+                            <label class="form-label">
+                                Address
+                            </label>
+
+                            <textarea
+                                name="address"
+                                class="form-control"
+                                rows="3"
+                            >{{ victim.address or '' }}</textarea>
+                        </div>
+
+
+                        <!-- Description -->
+                        <div class="mb-3">
+                            <label class="form-label">
+                                Description
+                            </label>
+
+                            <textarea
+                                name="description"
+                                class="form-control"
+                                rows="5"
+                            >{{ victim.description or '' }}</textarea>
+                        </div>
+
+
+                        <!-- Buttons -->
+                        <div class="d-flex gap-2">
+
+                            <button
+                                type="submit"
+                                class="btn btn-dark"
+                            >
+                                Update Victim
+                            </button>
+
+                            <a
+                                href="/victims"
+                                class="btn btn-outline-secondary"
+                            >
+                                Cancel
+                            </a>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

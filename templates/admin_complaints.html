@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+
+{% block title %}
+Complaint Management - Crime Investigation System
+{% endblock %}
+
+{% block content %}
+
+<div class="container mt-5">
+
+    <h2 class="text-center mb-4">
+        Complaint Management
+    </h2>
+
+    {% if complaints %}
+
+    <div class="table-responsive">
+
+        <table class="table table-bordered table-striped">
+
+            <thead class="table-dark">
+
+                <tr>
+                    <th>Complaint No.</th>
+                    <th>Citizen</th>
+                    <th>Crime Type</th>
+                    <th>Location</th>
+                    <th>Incident Date</th>
+                    <th>Description</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% for complaint in complaints %}
+
+                <tr>
+
+                    <td>
+                        {{ complaint.complaint_number }}
+                    </td>
+
+                    <td>
+                        {{ complaint.username }}
+                    </td>
+
+                    <td>
+                        {{ complaint.crime_type }}
+                    </td>
+
+                    <td>
+                        {{ complaint.location }}
+                    </td>
+
+                    <td>
+                        {{ complaint.incident_date }}
+                    </td>
+
+                    <td>
+                        {{ complaint.description }}
+                    </td>
+
+                    <td>
+
+                        {% if complaint.status == "Pending" %}
+
+                            <span class="badge bg-warning text-dark">
+                                Pending
+                            </span>
+
+                        {% elif complaint.status == "Approved" %}
+
+                            <span class="badge bg-success">
+                                Approved
+                            </span>
+
+                        {% elif complaint.status == "Rejected" %}
+
+                            <span class="badge bg-danger">
+                                Rejected
+                            </span>
+
+                        {% else %}
+
+                            <span class="badge bg-secondary">
+                                {{ complaint.status }}
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+                    <td>
+
+                        <form
+                            method="POST"
+                            action="/admin/update-complaint/{{ complaint.id }}"
+                        >
+
+                            <select
+                                name="status"
+                                class="form-select form-select-sm mb-2"
+                                required
+                            >
+
+                                <option
+                                    value="Pending"
+                                    {% if complaint.status == "Pending" %}
+                                    selected
+                                    {% endif %}
+                                >
+                                    Pending
+                                </option>
+
+                                <option
+                                    value="Approved"
+                                    {% if complaint.status == "Approved" %}
+                                    selected
+                                    {% endif %}
+                                >
+                                    Approved
+                                </option>
+
+                                <option
+                                    value="Rejected"
+                                    {% if complaint.status == "Rejected" %}
+                                    selected
+                                    {% endif %}
+                                >
+                                    Rejected
+                                </option>
+
+                                <option
+                                    value="Under Investigation"
+                                    {% if complaint.status == "Under Investigation" %}
+                                    selected
+                                    {% endif %}
+                                >
+                                    Under Investigation
+                                </option>
+
+                            </select>
+
+                            <button
+                                type="submit"
+                                class="btn btn-dark btn-sm w-100"
+                            >
+                                Update
+                            </button>
+
+                        </form>
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    {% else %}
+
+        <div class="alert alert-info text-center">
+            No complaints have been submitted yet.
+        </div>
+
+    {% endif %}
+
+    <div class="text-center mt-4">
+
+        <a
+            href="/dashboard"
+            class="btn btn-outline-dark"
+        >
+            Back to Dashboard
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}

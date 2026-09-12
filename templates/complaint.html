@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+
+{% block title %}
+Report Crime - Crime Investigation System
+{% endblock %}
+
+{% block content %}
+
+<div class="container mt-5">
+
+    <div class="row justify-content-center">
+
+        <div class="col-md-8">
+
+            <div class="card shadow">
+
+                <div class="card-body">
+
+                    <!-- =========================
+                         PAGE HEADING
+                    ========================== -->
+
+                    <h2 class="text-center mb-4">
+                        Report a Crime
+                    </h2>
+
+                    <p class="text-muted text-center">
+                        Submit a crime complaint to the
+                        investigation department.
+                    </p>
+
+
+                    <!-- =========================
+                         COMPLAINT FORM
+                    ========================== -->
+
+                    <form method="POST">
+
+
+                        <!-- COMPLAINT NUMBER -->
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Complaint Number
+                            </label>
+
+                            <input
+                                type="text"
+                                name="complaint_number"
+                                class="form-control"
+                                placeholder="Example: CMP001"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- CRIME TYPE -->
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Crime Type
+                            </label>
+
+                            <select
+                                name="crime_type"
+                                class="form-control"
+                                required
+                            >
+
+                                <option value="">
+                                    Select Crime Type
+                                </option>
+
+                                <option value="Theft">
+                                    Theft
+                                </option>
+
+                                <option value="Robbery">
+                                    Robbery
+                                </option>
+
+                                <option value="Cyber Crime">
+                                    Cyber Crime
+                                </option>
+
+                                <option value="Fraud">
+                                    Fraud
+                                </option>
+
+                                <option value="Missing Person">
+                                    Missing Person
+                                </option>
+
+                                <option value="Assault">
+                                    Assault
+                                </option>
+
+                                <option value="Other">
+                                    Other
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- LOCATION -->
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Incident Location
+                            </label>
+
+                            <input
+                                type="text"
+                                name="location"
+                                class="form-control"
+                                placeholder="Enter incident location"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- INCIDENT DATE -->
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Incident Date
+                            </label>
+
+                            <input
+                                type="date"
+                                name="incident_date"
+                                class="form-control"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- DESCRIPTION -->
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Complaint Description
+                            </label>
+
+                            <textarea
+                                name="description"
+                                class="form-control"
+                                rows="6"
+                                placeholder="Describe the incident..."
+                                required
+                            ></textarea>
+
+                        </div>
+
+
+                        <!-- SUBMIT BUTTON -->
+
+                        <button
+                            type="submit"
+                            class="btn btn-dark w-100"
+                        >
+                            Submit Complaint
+                        </button>
+
+
+                    </form>
+
+
+                    <!-- BACK TO DASHBOARD -->
+
+                    <div class="text-center mt-3">
+
+                        <a
+                            href="/dashboard"
+                            class="btn btn-outline-dark"
+                        >
+                            Back to Dashboard
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

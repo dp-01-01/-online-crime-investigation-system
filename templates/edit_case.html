@@ -1,0 +1,236 @@
+{% extends "base.html" %}
+
+{% block title %}
+Edit Case - Crime Investigation System
+{% endblock %}
+
+{% block content %}
+
+<div class="container mt-5">
+
+    <div class="row justify-content-center">
+
+        <div class="col-md-8">
+
+            <div class="card shadow">
+
+                <div class="card-body">
+
+                    <h2 class="text-center mb-4">
+                        Edit Case
+                    </h2>
+
+                    <form method="POST">
+
+                        <!-- Case Number -->
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Case Number
+                            </label>
+
+                            <input
+                                type="text"
+                                name="case_number"
+                                class="form-control"
+                                value="{{ case.case_number }}"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- Crime Type -->
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Crime Type
+                            </label>
+
+                            <select
+                                name="crime_type"
+                                class="form-control"
+                                required
+                            >
+
+                                <option value="Theft"
+                                    {% if case.crime_type == "Theft" %}selected{% endif %}>
+                                    Theft
+                                </option>
+
+                                <option value="Robbery"
+                                    {% if case.crime_type == "Robbery" %}selected{% endif %}>
+                                    Robbery
+                                </option>
+
+                                <option value="Cyber Crime"
+                                    {% if case.crime_type == "Cyber Crime" %}selected{% endif %}>
+                                    Cyber Crime
+                                </option>
+
+                                <option value="Fraud"
+                                    {% if case.crime_type == "Fraud" %}selected{% endif %}>
+                                    Fraud
+                                </option>
+
+                                <option value="Assault"
+                                    {% if case.crime_type == "Assault" %}selected{% endif %}>
+                                    Assault
+                                </option>
+
+                                <option value="Missing Person"
+                                    {% if case.crime_type == "Missing Person" %}selected{% endif %}>
+                                    Missing Person
+                                </option>
+
+                                <option value="Other"
+                                    {% if case.crime_type == "Other" %}selected{% endif %}>
+                                    Other
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- Location -->
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Location
+                            </label>
+
+                            <input
+                                type="text"
+                                name="location"
+                                class="form-control"
+                                value="{{ case.location }}"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- Incident Date -->
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Incident Date
+                            </label>
+
+                            <input
+                                type="date"
+                                name="incident_date"
+                                class="form-control"
+                                value="{{ case.incident_date }}"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- Description -->
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Description
+                            </label>
+
+                            <textarea
+                                name="description"
+                                class="form-control"
+                                rows="5"
+                                required
+                            >{{ case.description }}</textarea>
+
+                        </div>
+
+
+                        <!-- Status -->
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Status
+                            </label>
+
+                            <select
+                                name="status"
+                                class="form-control"
+                                required
+                            >
+
+                                <option value="Open"
+                                    {% if case.status == "Open" %}selected{% endif %}>
+                                    Open
+                                </option>
+
+                                <option value="Under Investigation"
+                                    {% if case.status == "Under Investigation" %}selected{% endif %}>
+                                    Under Investigation
+                                </option>
+
+                                <option value="Closed"
+                                    {% if case.status == "Closed" %}selected{% endif %}>
+                                    Closed
+                                </option>
+
+                                <option value="Pending"
+                                    {% if case.status == "Pending" %}selected{% endif %}>
+                                    Pending
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- Investigator -->
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Investigator
+                            </label>
+
+                            <input
+                                type="text"
+                                name="investigator"
+                                class="form-control"
+                                value="{{ case.investigator or '' }}"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- Buttons -->
+                        <div class="d-flex gap-2">
+
+                            <button
+                                type="submit"
+                                class="btn btn-dark"
+                            >
+                                Update Case
+                            </button>
+
+                            <a
+                                href="/cases"
+                                class="btn btn-outline-secondary"
+                            >
+                                Cancel
+                            </a>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block title %}
+My Complaints - Crime Investigation System
+{% endblock %}
+
+{% block content %}
+
+<div class="container mt-5">
+
+    <h2 class="text-center mb-4">
+        My Crime Complaints
+    </h2>
+
+    {% if complaints %}
+
+    <div class="table-responsive">
+
+        <table class="table table-bordered table-striped">
+
+            <thead class="table-dark">
+
+                <tr>
+                    <th>Complaint Number</th>
+                    <th>Crime Type</th>
+                    <th>Location</th>
+                    <th>Incident Date</th>
+                    <th>Description</th>
+                    <th>Status</th>
+                    <th>Submitted On</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% for complaint in complaints %}
+
+                <tr>
+
+                    <td>
+                        {{ complaint.complaint_number }}
+                    </td>
+
+                    <td>
+                        {{ complaint.crime_type }}
+                    </td>
+
+                    <td>
+                        {{ complaint.location }}
+                    </td>
+
+                    <td>
+                        {{ complaint.incident_date }}
+                    </td>
+
+                    <td>
+                        {{ complaint.description }}
+                    </td>
+
+                    <td>
+
+                        {% if complaint.status == "Pending" %}
+
+                            <span class="badge bg-warning text-dark">
+                                Pending
+                            </span>
+
+                        {% elif complaint.status == "Approved" %}
+
+                            <span class="badge bg-success">
+                                Approved
+                            </span>
+
+                        {% elif complaint.status == "Rejected" %}
+
+                            <span class="badge bg-danger">
+                                Rejected
+                            </span>
+
+                        {% else %}
+
+                            <span class="badge bg-secondary">
+                                {{ complaint.status }}
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+                    <td>
+                        {{ complaint.created_at }}
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    {% else %}
+
+        <div class="alert alert-info text-center">
+            You have not submitted any complaints yet.
+        </div>
+
+    {% endif %}
+
+    <div class="text-center mt-4">
+
+        <a
+            href="/complaint"
+            class="btn btn-dark me-2"
+        >
+            Report Another Crime
+        </a>
+
+        <a
+            href="/dashboard"
+            class="btn btn-outline-dark"
+        >
+            Back to Dashboard
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}
