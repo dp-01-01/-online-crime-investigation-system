@@ -6,47 +6,68 @@ Reports - Crime Investigation System
 
 {% block content %}
 
-<div class="container mt-5">
+<div class="container py-5">
 
-    <!-- Page Heading -->
-    <h1 class="mb-3">
-        Crime Investigation Reports
-    </h1>
+    <!-- =========================
+         PAGE HEADER
+    ========================== -->
 
-    <p class="text-muted">
-        Overview of crime cases and investigation records.
-    </p>
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-5">
 
+        <div>
 
-    <!-- Buttons -->
-    <div class="mt-4 mb-4">
+            <span class="badge bg-dark mb-2">
+                Crime Investigation Reports
+            </span>
 
-        <a
-            href="/dashboard"
-            class="btn btn-outline-dark"
-        >
-            Back to Dashboard
-        </a>
+            <h1 class="fw-bold mb-2">
+                Crime Investigation Reports
+            </h1>
+
+            <p class="text-muted mb-0">
+                Overview of crime cases and investigation records.
+            </p>
+
+        </div>
+
+        <div class="mt-3 mt-md-0">
+
+            <a
+                href="/dashboard"
+                class="btn btn-outline-dark"
+            >
+                ← Back to Dashboard
+            </a>
+
+        </div>
 
     </div>
 
 
-    <!-- Report Cards -->
-    <div class="row">
+    <!-- =========================
+         SUMMARY CARDS
+    ========================== -->
+
+    <div class="row g-4 mb-5">
 
 
         <!-- Total Cases -->
-        <div class="col-md-4 mb-4">
 
-            <div class="card shadow h-100">
+        <div class="col-md-6 col-lg-4">
 
-                <div class="card-body text-center">
+            <div class="card border-0 shadow-sm h-100">
 
-                    <h5>
+                <div class="card-body text-center p-4">
+
+                    <div class="fs-2 mb-2">
+                        📁
+                    </div>
+
+                    <p class="text-muted mb-1">
                         Total Cases
-                    </h5>
+                    </p>
 
-                    <h2>
+                    <h2 class="fw-bold">
                         {{ total_cases }}
                     </h2>
 
@@ -58,17 +79,22 @@ Reports - Crime Investigation System
 
 
         <!-- Open Cases -->
-        <div class="col-md-4 mb-4">
 
-            <div class="card shadow h-100">
+        <div class="col-md-6 col-lg-4">
 
-                <div class="card-body text-center">
+            <div class="card border-0 shadow-sm h-100">
 
-                    <h5>
+                <div class="card-body text-center p-4">
+
+                    <div class="fs-2 mb-2">
+                        🔓
+                    </div>
+
+                    <p class="text-muted mb-1">
                         Open Cases
-                    </h5>
+                    </p>
 
-                    <h2>
+                    <h2 class="fw-bold">
                         {{ open_cases }}
                     </h2>
 
@@ -80,17 +106,22 @@ Reports - Crime Investigation System
 
 
         <!-- Closed Cases -->
-        <div class="col-md-4 mb-4">
 
-            <div class="card shadow h-100">
+        <div class="col-md-6 col-lg-4">
 
-                <div class="card-body text-center">
+            <div class="card border-0 shadow-sm h-100">
 
-                    <h5>
+                <div class="card-body text-center p-4">
+
+                    <div class="fs-2 mb-2">
+                        🔒
+                    </div>
+
+                    <p class="text-muted mb-1">
                         Closed Cases
-                    </h5>
+                    </p>
 
-                    <h2>
+                    <h2 class="fw-bold">
                         {{ closed_cases }}
                     </h2>
 
@@ -102,17 +133,22 @@ Reports - Crime Investigation System
 
 
         <!-- Total Victims -->
-        <div class="col-md-4 mb-4">
 
-            <div class="card shadow h-100">
+        <div class="col-md-6 col-lg-4">
 
-                <div class="card-body text-center">
+            <div class="card border-0 shadow-sm h-100">
 
-                    <h5>
+                <div class="card-body text-center p-4">
+
+                    <div class="fs-2 mb-2">
+                        👤
+                    </div>
+
+                    <p class="text-muted mb-1">
                         Total Victims
-                    </h5>
+                    </p>
 
-                    <h2>
+                    <h2 class="fw-bold">
                         {{ total_victims }}
                     </h2>
 
@@ -124,17 +160,22 @@ Reports - Crime Investigation System
 
 
         <!-- Total Suspects -->
-        <div class="col-md-4 mb-4">
 
-            <div class="card shadow h-100">
+        <div class="col-md-6 col-lg-4">
 
-                <div class="card-body text-center">
+            <div class="card border-0 shadow-sm h-100">
 
-                    <h5>
+                <div class="card-body text-center p-4">
+
+                    <div class="fs-2 mb-2">
+                        🔎
+                    </div>
+
+                    <p class="text-muted mb-1">
                         Total Suspects
-                    </h5>
+                    </p>
 
-                    <h2>
+                    <h2 class="fw-bold">
                         {{ total_suspects }}
                     </h2>
 
@@ -146,17 +187,22 @@ Reports - Crime Investigation System
 
 
         <!-- Total Evidence -->
-        <div class="col-md-4 mb-4">
 
-            <div class="card shadow h-100">
+        <div class="col-md-6 col-lg-4">
 
-                <div class="card-body text-center">
+            <div class="card border-0 shadow-sm h-100">
 
-                    <h5>
+                <div class="card-body text-center p-4">
+
+                    <div class="fs-2 mb-2">
+                        🧾
+                    </div>
+
+                    <p class="text-muted mb-1">
                         Total Evidence
-                    </h5>
+                    </p>
 
-                    <h2>
+                    <h2 class="fw-bold">
                         {{ total_evidence }}
                     </h2>
 
@@ -168,17 +214,22 @@ Reports - Crime Investigation System
 
 
         <!-- Total Investigations -->
-        <div class="col-md-4 mb-4">
 
-            <div class="card shadow h-100">
+        <div class="col-md-6 col-lg-4">
 
-                <div class="card-body text-center">
+            <div class="card border-0 shadow-sm h-100">
 
-                    <h5>
+                <div class="card-body text-center p-4">
+
+                    <div class="fs-2 mb-2">
+                        🕵️
+                    </div>
+
+                    <p class="text-muted mb-1">
                         Total Investigations
-                    </h5>
+                    </p>
 
-                    <h2>
+                    <h2 class="fw-bold">
                         {{ total_investigations }}
                     </h2>
 
@@ -188,9 +239,375 @@ Reports - Crime Investigation System
 
         </div>
 
+    </div>
+
+
+    <!-- =========================
+         CHARTS
+    ========================== -->
+
+    <div class="mb-4">
+
+        <h3 class="fw-bold">
+            Visual Reports
+        </h3>
+
+        <p class="text-muted">
+            Graphical representation of investigation data.
+        </p>
+
+    </div>
+
+
+    <div class="row g-4">
+
+
+        <!-- Case Status Chart -->
+
+        <div class="col-lg-6">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body p-4">
+
+                    <h4 class="fw-bold mb-4">
+                        📊 Case Status
+                    </h4>
+
+                    <div style="height: 320px;">
+
+                        <canvas id="caseStatusChart"></canvas>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Victims vs Suspects -->
+
+        <div class="col-lg-6">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body p-4">
+
+                    <h4 class="fw-bold mb-4">
+                        👥 Victims vs Suspects
+                    </h4>
+
+                    <div style="height: 320px;">
+
+                        <canvas id="peopleChart"></canvas>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Evidence vs Investigations -->
+
+        <div class="col-lg-6">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body p-4">
+
+                    <h4 class="fw-bold mb-4">
+                        📋 Evidence & Investigations
+                    </h4>
+
+                    <div style="height: 320px;">
+
+                        <canvas id="activityChart"></canvas>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Case Summary -->
+
+        <div class="col-lg-6">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body p-4">
+
+                    <h4 class="fw-bold mb-4">
+                        📈 Case Summary
+                    </h4>
+
+                    <div style="height: 320px;">
+
+                        <canvas id="summaryChart"></canvas>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
 
     </div>
 
 </div>
+
+
+<!-- =========================
+     CHART.JS
+========================== -->
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+<script>
+
+    // =========================
+    // CASE STATUS CHART
+    // =========================
+
+    const caseStatusChart =
+        document.getElementById("caseStatusChart");
+
+    new Chart(caseStatusChart, {
+
+        type: "doughnut",
+
+        data: {
+
+            labels: [
+                "Open Cases",
+                "Closed Cases"
+            ],
+
+            datasets: [{
+
+                data: [
+                    {{ open_cases }},
+                    {{ closed_cases }}
+                ]
+
+            }]
+
+        },
+
+        options: {
+
+            responsive: true,
+
+            maintainAspectRatio: false,
+
+            plugins: {
+
+                legend: {
+                    position: "bottom"
+                }
+
+            }
+
+        }
+
+    });
+
+
+    // =========================
+    // VICTIMS VS SUSPECTS
+    // =========================
+
+    const peopleChart =
+        document.getElementById("peopleChart");
+
+    new Chart(peopleChart, {
+
+        type: "bar",
+
+        data: {
+
+            labels: [
+                "Victims",
+                "Suspects"
+            ],
+
+            datasets: [{
+
+                label: "Total Records",
+
+                data: [
+                    {{ total_victims }},
+                    {{ total_suspects }}
+                ]
+
+            }]
+
+        },
+
+        options: {
+
+            responsive: true,
+
+            maintainAspectRatio: false,
+
+            scales: {
+
+                y: {
+
+                    beginAtZero: true,
+
+                    ticks: {
+                        precision: 0
+                    }
+
+                }
+
+            },
+
+            plugins: {
+
+                legend: {
+                    display: false
+                }
+
+            }
+
+        }
+
+    });
+
+
+    // =========================
+    // EVIDENCE & INVESTIGATIONS
+    // =========================
+
+    const activityChart =
+        document.getElementById("activityChart");
+
+    new Chart(activityChart, {
+
+        type: "bar",
+
+        data: {
+
+            labels: [
+                "Evidence",
+                "Investigations"
+            ],
+
+            datasets: [{
+
+                label: "Total Records",
+
+                data: [
+                    {{ total_evidence }},
+                    {{ total_investigations }}
+                ]
+
+            }]
+
+        },
+
+        options: {
+
+            responsive: true,
+
+            maintainAspectRatio: false,
+
+            scales: {
+
+                y: {
+
+                    beginAtZero: true,
+
+                    ticks: {
+                        precision: 0
+                    }
+
+                }
+
+            },
+
+            plugins: {
+
+                legend: {
+                    display: false
+                }
+
+            }
+
+        }
+
+    });
+
+
+    // =========================
+    // CASE SUMMARY
+    // =========================
+
+    const summaryChart =
+        document.getElementById("summaryChart");
+
+    new Chart(summaryChart, {
+
+        type: "bar",
+
+        data: {
+
+            labels: [
+                "Total Cases",
+                "Open Cases",
+                "Closed Cases"
+            ],
+
+            datasets: [{
+
+                label: "Cases",
+
+                data: [
+                    {{ total_cases }},
+                    {{ open_cases }},
+                    {{ closed_cases }}
+                ]
+
+            }]
+
+        },
+
+        options: {
+
+            responsive: true,
+
+            maintainAspectRatio: false,
+
+            scales: {
+
+                y: {
+
+                    beginAtZero: true,
+
+                    ticks: {
+                        precision: 0
+                    }
+
+                }
+
+            }
+
+        }
+
+    });
+
+</script>
 
 {% endblock %}
