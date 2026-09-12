@@ -196,7 +196,48 @@ def register():
 @login_required
 def dashboard():
 
-    return render_template("dashboard.html")
+    connection = get_db_connection()
+    cursor = connection.cursor()
+
+    # Total cases
+    cursor.execute("SELECT COUNT(*) FROM cases")
+    total_cases = cursor.fetchone()[0]
+
+    # Open cases
+    cursor.execute(
+        "SELECT COUNT(*) FROM cases WHERE status = %s",
+        ("Open",)
+    )
+    open_cases = cursor.fetchone()[0]
+
+    # Total victims
+    cursor.execute("SELECT COUNT(*) FROM victims")
+    total_victims = cursor.fetchone()[0]
+
+    # Total suspects
+    cursor.execute("SELECT COUNT(*) FROM suspects")
+    total_suspects = cursor.fetchone()[0]
+
+    # Total evidence
+    cursor.execute("SELECT COUNT(*) FROM evidence")
+    total_evidence = cursor.fetchone()[0]
+
+    # Total investigations
+    cursor.execute("SELECT COUNT(*) FROM investigations")
+    total_investigations = cursor.fetchone()[0]
+
+    cursor.close()
+    connection.close()
+
+    return render_template(
+        "dashboard.html",
+        total_cases=total_cases,
+        open_cases=open_cases,
+        total_victims=total_victims,
+        total_suspects=total_suspects,
+        total_evidence=total_evidence,
+        total_investigations=total_investigations
+    )
 
 
 # ==================================================
