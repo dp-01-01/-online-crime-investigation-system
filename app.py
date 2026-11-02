@@ -1,13 +1,18 @@
-from flask import Flask, render_template, request, redirect, url_for, session
-import mysql.connector
-from werkzeug.security import generate_password_hash, check_password_hash
-from dotenv import load_dotenv
-from functools import wraps
 import os
+import sys
+import secrets
+import sqlite3
+from functools import wraps
+
+from dotenv import load_dotenv
+from flask import Flask, render_template, request, redirect, url_for, session
+from werkzeug.security import generate_password_hash, check_password_hash
 
 
-# Load environment variables from .env
+# Load environment variables from .env (optional)
 load_dotenv()
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 # =========================
@@ -16,7 +21,9 @@ load_dotenv()
 
 app = Flask(__name__)
 
-app.secret_key = os.getenv("FLASK_SECRET_KEY")
+# If FLASK_SECRET_KEY is not set, a random key is generated.
+# Sessions will then reset whenever the app restarts, so set it in production.
+app.secret_key = os.getenv("FLASK_SECRET_KEY") or secrets.token_hex(32)
 
 
 # =========================
@@ -26,9 +33,161 @@ app.secret_key = os.getenv("FLASK_SECRET_KEY")
 app.config["SESSION_COOKIE_HTTPONLY"] = True
 app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 
-# Keep False for local HTTP development.
-# Change to True when deployed with HTTPS.
-app.config["SESSION_COOKIE_SECURE"] = False
+# Set SESSION_COOKIE_SECURE=true in your environment when deployed with HTTPS.
+app.config["SESSION_COOKIE_SECURE"] = (
+    os.getenv("SESSION_COOKIE_SECURE", "false").lower() == "true"
+)
+
+
+# =========================
+# DATABASE (SQLite)
+# =========================
+
+DATABASE = os.getenv("DATABASE_PATH", os.path.join(BASE_DIR, "crime_system.db"))
+
+SCHEMA = """
+CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT NOT NULL UNIQUE,
+    email TEXT NOT NULL UNIQUE,
+    password TEXT NOT NULL,
+    role TEXT NOT NULL DEFAULT 'citizen'
+        CHECK (role IN ('admin', 'investigator', 'citizen')),
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS cases (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    case_number TEXT NOT NULL UNIQUE,
+    crime_type TEXT,
+    location TEXT,
+    incident_date TEXT,
+    description TEXT,
+    status TEXT DEFAULT 'Open',
+    investigator TEXT,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS victims (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    case_number TEXT,
+    name TEXT,
+    age INTEGER,
+    gender TEXT,
+    phone TEXT,
+    address TEXT,
+    description TEXT,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS suspects (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    case_number TEXT,
+    name TEXT,
+    age INTEGER,
+    gender TEXT,
+    phone TEXT,
+    address TEXT,
+    description TEXT,
+    status TEXT,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS evidence (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    case_number TEXT,
+    evidence_type TEXT,
+    description TEXT,
+    collected_date TEXT,
+    collected_by TEXT,
+    location_found TEXT,
+    status TEXT,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS investigations (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    case_number TEXT,
+    investigator TEXT,
+    investigation_date TEXT,
+    investigation_type TEXT,
+    details TEXT,
+    findings TEXT,
+    status TEXT,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS complaints (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    complaint_number TEXT NOT NULL UNIQUE,
+    username TEXT NOT NULL,
+    crime_type TEXT,
+    location TEXT,
+    incident_date TEXT,
+    description TEXT,
+    status TEXT DEFAULT 'Pending',
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+"""
+
+
+def get_db_connection():
+    connection = sqlite3.connect(DATABASE)
+    # Rows behave like dictionaries: row["name"] (also works in Jinja: row.name)
+    connection.row_factory = sqlite3.Row
+    connection.execute("PRAGMA foreign_keys = ON")
+    return connection
+
+
+def init_db():
+    """Create all tables if they do not exist yet."""
+    connection = get_db_connection()
+    try:
+        connection.executescript(SCHEMA)
+        connection.commit()
+    finally:
+        connection.close()
+
+
+def fetch_all(query, params=()):
+    connection = get_db_connection()
+    try:
+        return connection.execute(query, params).fetchall()
+    finally:
+        connection.close()
+
+
+def fetch_one(query, params=()):
+    connection = get_db_connection()
+    try:
+        return connection.execute(query, params).fetchone()
+    finally:
+        connection.close()
+
+
+def write_db(query, params, error_message):
+    """
+    Run an INSERT / UPDATE / DELETE.
+    Returns None on success, or an error string on failure.
+    """
+    connection = get_db_connection()
+    try:
+        connection.execute(query, params)
+        connection.commit()
+        return None
+    except sqlite3.Error as error:
+        connection.rollback()
+        return f"{error_message}: {error}"
+    finally:
+        connection.close()
+
+
+def count_rows(table, where="", params=()):
+    # 'table' and 'where' are fixed strings written in this file, never user input.
+    sql = f"SELECT COUNT(*) FROM {table}"
+    if where:
+        sql += f" WHERE {where}"
+    return fetch_one(sql, params)[0]
 
 
 # =========================
@@ -73,24 +232,6 @@ def role_required(*roles):
 
 
 # =========================
-# DATABASE CONNECTION
-# =========================
-
-# =========================
-# DATABASE CONNECTION
-# =========================
-
-def get_db_connection():
-    return mysql.connector.connect(
-        host="127.0.0.1",
-        port=3306,
-        user=os.getenv("DB_USER"),
-        password=os.getenv("DB_PASSWORD"),
-        database=os.getenv("DB_NAME")
-    )
-
-
-# =========================
 # HOME PAGE
 # =========================
 
@@ -119,26 +260,12 @@ def login():
                 error="Please enter username and password."
             )
 
-        connection = get_db_connection()
-        cursor = connection.cursor(dictionary=True)
+        user = fetch_one(
+            "SELECT * FROM users WHERE username = ?",
+            (username,)
+        )
 
-        query = """
-            SELECT *
-            FROM users
-            WHERE username = %s
-        """
-
-        cursor.execute(query, (username,))
-
-        user = cursor.fetchone()
-
-        cursor.close()
-        connection.close()
-
-        if user and check_password_hash(
-            user["password"],
-            password
-        ):
+        if user and check_password_hash(user["password"], password):
 
             session["user_id"] = user["id"]
             session["username"] = user["username"]
@@ -152,6 +279,7 @@ def login():
         )
 
     return render_template("login.html")
+
 
 # =========================
 # REGISTRATION PAGE
@@ -170,8 +298,6 @@ def register():
         # Do not trust the role sent by the browser.
         role = "citizen"
 
-        # Basic validation
-
         if not username or not email or not password:
 
             return render_template(
@@ -186,77 +312,39 @@ def register():
                 error="Password must contain at least 6 characters."
             )
 
-        hashed_password = generate_password_hash(password)
+        existing_user = fetch_one(
+            "SELECT id FROM users WHERE username = ? OR email = ?",
+            (username, email)
+        )
 
-        connection = get_db_connection()
-        cursor = connection.cursor()
+        if existing_user:
 
-        try:
-
-            # Check whether username or email already exists
-
-            check_query = """
-                SELECT id
-                FROM users
-                WHERE username = %s
-                   OR email = %s
-            """
-
-            cursor.execute(
-                check_query,
-                (username, email)
+            return render_template(
+                "register.html",
+                error="Username or email already exists. Please use a different one."
             )
 
-            existing_user = cursor.fetchone()
-
-            if existing_user:
-
-                return render_template(
-                    "register.html",
-                    error="Username or email already exists. Please use a different one."
-                )
-
-            # Insert new citizen account
-
-            query = """
-                INSERT INTO users
-                (
-                    username,
-                    email,
-                    password,
-                    role
-                )
-                VALUES (%s, %s, %s, %s)
+        error = write_db(
             """
+            INSERT INTO users (username, email, password, role)
+            VALUES (?, ?, ?, ?)
+            """,
+            (username, email, generate_password_hash(password), role),
+            "Registration failed"
+        )
 
-            values = (
-                username,
-                email,
-                hashed_password,
-                role
-            )
-
-            cursor.execute(query, values)
-
-            connection.commit()
-
-        except mysql.connector.Error:
-
-            connection.rollback()
+        if error:
 
             return render_template(
                 "register.html",
                 error="Registration failed. Please try again."
             )
 
-        finally:
-
-            cursor.close()
-            connection.close()
-
         return redirect(url_for("login"))
 
     return render_template("register.html")
+
+
 # =========================
 # DASHBOARD PAGE
 # =========================
@@ -265,47 +353,14 @@ def register():
 @login_required
 def dashboard():
 
-    connection = get_db_connection()
-    cursor = connection.cursor()
-
-    # Total cases
-    cursor.execute("SELECT COUNT(*) FROM cases")
-    total_cases = cursor.fetchone()[0]
-
-    # Open cases
-    cursor.execute(
-        "SELECT COUNT(*) FROM cases WHERE status = %s",
-        ("Open",)
-    )
-    open_cases = cursor.fetchone()[0]
-
-    # Total victims
-    cursor.execute("SELECT COUNT(*) FROM victims")
-    total_victims = cursor.fetchone()[0]
-
-    # Total suspects
-    cursor.execute("SELECT COUNT(*) FROM suspects")
-    total_suspects = cursor.fetchone()[0]
-
-    # Total evidence
-    cursor.execute("SELECT COUNT(*) FROM evidence")
-    total_evidence = cursor.fetchone()[0]
-
-    # Total investigations
-    cursor.execute("SELECT COUNT(*) FROM investigations")
-    total_investigations = cursor.fetchone()[0]
-
-    cursor.close()
-    connection.close()
-
     return render_template(
         "dashboard.html",
-        total_cases=total_cases,
-        open_cases=open_cases,
-        total_victims=total_victims,
-        total_suspects=total_suspects,
-        total_evidence=total_evidence,
-        total_investigations=total_investigations
+        total_cases=count_rows("cases"),
+        open_cases=count_rows("cases", "status = ?", ("Open",)),
+        total_victims=count_rows("victims"),
+        total_suspects=count_rows("suspects"),
+        total_evidence=count_rows("evidence"),
+        total_investigations=count_rows("investigations")
     )
 
 
@@ -320,15 +375,7 @@ def cases():
     search = request.args.get("search", "").strip()
     status = request.args.get("status", "").strip()
 
-    connection = get_db_connection()
-    cursor = connection.cursor(dictionary=True)
-
-    query = """
-        SELECT *
-        FROM cases
-        WHERE 1=1
-    """
-
+    query = "SELECT * FROM cases WHERE 1=1"
     values = []
 
     # SEARCH
@@ -336,45 +383,29 @@ def cases():
 
         query += """
             AND (
-                case_number LIKE %s
-                OR crime_type LIKE %s
-                OR location LIKE %s
-                OR investigator LIKE %s
+                case_number LIKE ?
+                OR crime_type LIKE ?
+                OR location LIKE ?
+                OR investigator LIKE ?
             )
         """
 
         search_value = "%" + search + "%"
-
-        values.extend([
-            search_value,
-            search_value,
-            search_value,
-            search_value
-        ])
+        values.extend([search_value] * 4)
 
     # STATUS FILTER
     if status:
 
-        query += """
-            AND status = %s
-        """
-
+        query += " AND status = ?"
         values.append(status)
 
-    query += """
-        ORDER BY id DESC
-    """
+    query += " ORDER BY id DESC"
 
-    cursor.execute(query, values)
-
-    cases = cursor.fetchall()
-
-    cursor.close()
-    connection.close()
+    case_list = fetch_all(query, values)
 
     return render_template(
         "cases.html",
-        cases=cases,
+        cases=case_list,
         search=search,
         status=status
     )
@@ -390,18 +421,18 @@ def add_case():
 
     if request.method == "POST":
 
-        case_number = request.form["case_number"]
-        crime_type = request.form["crime_type"]
-        location = request.form["location"]
-        incident_date = request.form["incident_date"]
-        description = request.form["description"]
-        status = request.form["status"]
-        investigator = request.form["investigator"]
+        values = (
+            request.form["case_number"],
+            request.form["crime_type"],
+            request.form["location"],
+            request.form["incident_date"],
+            request.form["description"],
+            request.form["status"],
+            request.form["investigator"]
+        )
 
-        connection = get_db_connection()
-        cursor = connection.cursor()
-
-        query = """
+        error = write_db(
+            """
             INSERT INTO cases
             (
                 case_number,
@@ -412,36 +443,14 @@ def add_case():
                 status,
                 investigator
             )
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
-        """
-
-        values = (
-            case_number,
-            crime_type,
-            location,
-            incident_date,
-            description,
-            status,
-            investigator
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+            """,
+            values,
+            "Case could not be added"
         )
 
-        try:
-
-            cursor.execute(query, values)
-
-            connection.commit()
-
-        except mysql.connector.Error as error:
-
-            connection.rollback()
-
-            cursor.close()
-            connection.close()
-
-            return f"Case could not be added: {error}"
-
-        cursor.close()
-        connection.close()
+        if error:
+            return error
 
         return redirect(url_for("cases"))
 
@@ -456,87 +465,47 @@ def add_case():
 @role_required("admin", "investigator")
 def edit_case(case_id):
 
-    connection = get_db_connection()
-
     if request.method == "POST":
 
-        cursor = connection.cursor()
-
-        case_number = request.form["case_number"]
-        crime_type = request.form["crime_type"]
-        location = request.form["location"]
-        incident_date = request.form["incident_date"]
-        description = request.form["description"]
-        status = request.form["status"]
-        investigator = request.form["investigator"]
-
-        query = """
-            UPDATE cases
-            SET
-                case_number = %s,
-                crime_type = %s,
-                location = %s,
-                incident_date = %s,
-                description = %s,
-                status = %s,
-                investigator = %s
-            WHERE id = %s
-        """
-
         values = (
-            case_number,
-            crime_type,
-            location,
-            incident_date,
-            description,
-            status,
-            investigator,
+            request.form["case_number"],
+            request.form["crime_type"],
+            request.form["location"],
+            request.form["incident_date"],
+            request.form["description"],
+            request.form["status"],
+            request.form["investigator"],
             case_id
         )
 
-        try:
+        error = write_db(
+            """
+            UPDATE cases
+            SET
+                case_number = ?,
+                crime_type = ?,
+                location = ?,
+                incident_date = ?,
+                description = ?,
+                status = ?,
+                investigator = ?
+            WHERE id = ?
+            """,
+            values,
+            "Case could not be updated"
+        )
 
-            cursor.execute(query, values)
-
-            connection.commit()
-
-        except mysql.connector.Error as error:
-
-            connection.rollback()
-
-            cursor.close()
-            connection.close()
-
-            return f"Case could not be updated: {error}"
-
-        cursor.close()
-        connection.close()
+        if error:
+            return error
 
         return redirect(url_for("cases"))
 
-    cursor = connection.cursor(dictionary=True)
-
-    query = """
-        SELECT *
-        FROM cases
-        WHERE id = %s
-    """
-
-    cursor.execute(query, (case_id,))
-
-    case = cursor.fetchone()
-
-    cursor.close()
-    connection.close()
+    case = fetch_one("SELECT * FROM cases WHERE id = ?", (case_id,))
 
     if not case:
-
         return "Case not found"
 
-    return render_template(
-        "edit_case.html",
-        case=case
-    )
+    return render_template("edit_case.html", case=case)
 
 
 # =========================
@@ -547,31 +516,14 @@ def edit_case(case_id):
 @role_required("admin", "investigator")
 def delete_case(case_id):
 
-    connection = get_db_connection()
-    cursor = connection.cursor()
+    error = write_db(
+        "DELETE FROM cases WHERE id = ?",
+        (case_id,),
+        "Case could not be deleted"
+    )
 
-    query = """
-        DELETE FROM cases
-        WHERE id = %s
-    """
-
-    try:
-
-        cursor.execute(query, (case_id,))
-
-        connection.commit()
-
-    except mysql.connector.Error as error:
-
-        connection.rollback()
-
-        cursor.close()
-        connection.close()
-
-        return f"Case could not be deleted: {error}"
-
-    cursor.close()
-    connection.close()
+    if error:
+        return error
 
     return redirect(url_for("cases"))
 
@@ -584,26 +536,9 @@ def delete_case(case_id):
 @role_required("admin", "investigator")
 def victims():
 
-    connection = get_db_connection()
-    cursor = connection.cursor(dictionary=True)
+    victim_list = fetch_all("SELECT * FROM victims ORDER BY id DESC")
 
-    query = """
-        SELECT *
-        FROM victims
-        ORDER BY id DESC
-    """
-
-    cursor.execute(query)
-
-    victims = cursor.fetchall()
-
-    cursor.close()
-    connection.close()
-
-    return render_template(
-        "victims.html",
-        victims=victims
-    )
+    return render_template("victims.html", victims=victim_list)
 
 
 # =========================
@@ -616,18 +551,18 @@ def add_victim():
 
     if request.method == "POST":
 
-        case_number = request.form["case_number"]
-        name = request.form["name"]
-        age = request.form["age"]
-        gender = request.form["gender"]
-        phone = request.form["phone"]
-        address = request.form["address"]
-        description = request.form["description"]
+        values = (
+            request.form["case_number"],
+            request.form["name"],
+            request.form["age"],
+            request.form["gender"],
+            request.form["phone"],
+            request.form["address"],
+            request.form["description"]
+        )
 
-        connection = get_db_connection()
-        cursor = connection.cursor()
-
-        query = """
+        error = write_db(
+            """
             INSERT INTO victims
             (
                 case_number,
@@ -638,36 +573,14 @@ def add_victim():
                 address,
                 description
             )
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
-        """
-
-        values = (
-            case_number,
-            name,
-            age,
-            gender,
-            phone,
-            address,
-            description
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+            """,
+            values,
+            "Victim could not be added"
         )
 
-        try:
-
-            cursor.execute(query, values)
-
-            connection.commit()
-
-        except mysql.connector.Error as error:
-
-            connection.rollback()
-
-            cursor.close()
-            connection.close()
-
-            return f"Victim could not be added: {error}"
-
-        cursor.close()
-        connection.close()
+        if error:
+            return error
 
         return redirect(url_for("victims"))
 
@@ -682,87 +595,47 @@ def add_victim():
 @role_required("admin", "investigator")
 def edit_victim(victim_id):
 
-    connection = get_db_connection()
-
     if request.method == "POST":
 
-        cursor = connection.cursor()
-
-        case_number = request.form["case_number"]
-        name = request.form["name"]
-        age = request.form["age"]
-        gender = request.form["gender"]
-        phone = request.form["phone"]
-        address = request.form["address"]
-        description = request.form["description"]
-
-        query = """
-            UPDATE victims
-            SET
-                case_number = %s,
-                name = %s,
-                age = %s,
-                gender = %s,
-                phone = %s,
-                address = %s,
-                description = %s
-            WHERE id = %s
-        """
-
         values = (
-            case_number,
-            name,
-            age,
-            gender,
-            phone,
-            address,
-            description,
+            request.form["case_number"],
+            request.form["name"],
+            request.form["age"],
+            request.form["gender"],
+            request.form["phone"],
+            request.form["address"],
+            request.form["description"],
             victim_id
         )
 
-        try:
+        error = write_db(
+            """
+            UPDATE victims
+            SET
+                case_number = ?,
+                name = ?,
+                age = ?,
+                gender = ?,
+                phone = ?,
+                address = ?,
+                description = ?
+            WHERE id = ?
+            """,
+            values,
+            "Victim could not be updated"
+        )
 
-            cursor.execute(query, values)
-
-            connection.commit()
-
-        except mysql.connector.Error as error:
-
-            connection.rollback()
-
-            cursor.close()
-            connection.close()
-
-            return f"Victim could not be updated: {error}"
-
-        cursor.close()
-        connection.close()
+        if error:
+            return error
 
         return redirect(url_for("victims"))
 
-    cursor = connection.cursor(dictionary=True)
-
-    query = """
-        SELECT *
-        FROM victims
-        WHERE id = %s
-    """
-
-    cursor.execute(query, (victim_id,))
-
-    victim = cursor.fetchone()
-
-    cursor.close()
-    connection.close()
+    victim = fetch_one("SELECT * FROM victims WHERE id = ?", (victim_id,))
 
     if not victim:
-
         return "Victim not found"
 
-    return render_template(
-        "edit_victim.html",
-        victim=victim
-    )
+    return render_template("edit_victim.html", victim=victim)
 
 
 # =========================
@@ -773,31 +646,14 @@ def edit_victim(victim_id):
 @role_required("admin", "investigator")
 def delete_victim(victim_id):
 
-    connection = get_db_connection()
-    cursor = connection.cursor()
+    error = write_db(
+        "DELETE FROM victims WHERE id = ?",
+        (victim_id,),
+        "Victim could not be deleted"
+    )
 
-    query = """
-        DELETE FROM victims
-        WHERE id = %s
-    """
-
-    try:
-
-        cursor.execute(query, (victim_id,))
-
-        connection.commit()
-
-    except mysql.connector.Error as error:
-
-        connection.rollback()
-
-        cursor.close()
-        connection.close()
-
-        return f"Victim could not be deleted: {error}"
-
-    cursor.close()
-    connection.close()
+    if error:
+        return error
 
     return redirect(url_for("victims"))
 
@@ -810,26 +666,9 @@ def delete_victim(victim_id):
 @role_required("admin", "investigator")
 def suspects():
 
-    connection = get_db_connection()
-    cursor = connection.cursor(dictionary=True)
+    suspect_list = fetch_all("SELECT * FROM suspects ORDER BY id DESC")
 
-    query = """
-        SELECT *
-        FROM suspects
-        ORDER BY id DESC
-    """
-
-    cursor.execute(query)
-
-    suspects = cursor.fetchall()
-
-    cursor.close()
-    connection.close()
-
-    return render_template(
-        "suspects.html",
-        suspects=suspects
-    )
+    return render_template("suspects.html", suspects=suspect_list)
 
 
 # =========================
@@ -842,19 +681,19 @@ def add_suspect():
 
     if request.method == "POST":
 
-        case_number = request.form["case_number"]
-        name = request.form["name"]
-        age = request.form["age"]
-        gender = request.form["gender"]
-        phone = request.form["phone"]
-        address = request.form["address"]
-        description = request.form["description"]
-        status = request.form["status"]
+        values = (
+            request.form["case_number"],
+            request.form["name"],
+            request.form["age"],
+            request.form["gender"],
+            request.form["phone"],
+            request.form["address"],
+            request.form["description"],
+            request.form["status"]
+        )
 
-        connection = get_db_connection()
-        cursor = connection.cursor()
-
-        query = """
+        error = write_db(
+            """
             INSERT INTO suspects
             (
                 case_number,
@@ -866,37 +705,14 @@ def add_suspect():
                 description,
                 status
             )
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-        """
-
-        values = (
-            case_number,
-            name,
-            age,
-            gender,
-            phone,
-            address,
-            description,
-            status
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            values,
+            "Suspect could not be added"
         )
 
-        try:
-
-            cursor.execute(query, values)
-
-            connection.commit()
-
-        except mysql.connector.Error as error:
-
-            connection.rollback()
-
-            cursor.close()
-            connection.close()
-
-            return f"Suspect could not be added: {error}"
-
-        cursor.close()
-        connection.close()
+        if error:
+            return error
 
         return redirect(url_for("suspects"))
 
@@ -911,120 +727,67 @@ def add_suspect():
 @role_required("admin", "investigator")
 def edit_suspect(suspect_id):
 
-    connection = get_db_connection()
-
     if request.method == "POST":
 
-        cursor = connection.cursor()
-
-        case_number = request.form["case_number"]
-        name = request.form["name"]
-        age = request.form["age"]
-        gender = request.form["gender"]
-        phone = request.form["phone"]
-        address = request.form["address"]
-        description = request.form["description"]
-        status = request.form["status"]
-
-        query = """
-            UPDATE suspects
-            SET
-                case_number = %s,
-                name = %s,
-                age = %s,
-                gender = %s,
-                phone = %s,
-                address = %s,
-                description = %s,
-                status = %s
-            WHERE id = %s
-        """
-
         values = (
-            case_number,
-            name,
-            age,
-            gender,
-            phone,
-            address,
-            description,
-            status,
+            request.form["case_number"],
+            request.form["name"],
+            request.form["age"],
+            request.form["gender"],
+            request.form["phone"],
+            request.form["address"],
+            request.form["description"],
+            request.form["status"],
             suspect_id
         )
 
-        try:
+        error = write_db(
+            """
+            UPDATE suspects
+            SET
+                case_number = ?,
+                name = ?,
+                age = ?,
+                gender = ?,
+                phone = ?,
+                address = ?,
+                description = ?,
+                status = ?
+            WHERE id = ?
+            """,
+            values,
+            "Suspect could not be updated"
+        )
 
-            cursor.execute(query, values)
-
-            connection.commit()
-
-        except mysql.connector.Error as error:
-
-            connection.rollback()
-
-            cursor.close()
-            connection.close()
-
-            return f"Suspect could not be updated: {error}"
-
-        cursor.close()
-        connection.close()
+        if error:
+            return error
 
         return redirect(url_for("suspects"))
 
-    cursor = connection.cursor(dictionary=True)
-
-    query = """
-        SELECT *
-        FROM suspects
-        WHERE id = %s
-    """
-
-    cursor.execute(query, (suspect_id,))
-
-    suspect = cursor.fetchone()
-
-    cursor.close()
-    connection.close()
+    suspect = fetch_one("SELECT * FROM suspects WHERE id = ?", (suspect_id,))
 
     if not suspect:
-
         return "Suspect not found"
 
-    return render_template(
-        "edit_suspect.html",
-        suspect=suspect
-    )
+    return render_template("edit_suspect.html", suspect=suspect)
+
+
+# =========================
+# DELETE SUSPECT
+# =========================
 
 @app.route("/delete-suspect/<int:suspect_id>", methods=["POST"])
 @role_required("admin", "investigator")
 def delete_suspect(suspect_id):
 
-    connection = get_db_connection()
-    cursor = connection.cursor()
+    error = write_db(
+        "DELETE FROM suspects WHERE id = ?",
+        (suspect_id,),
+        "Suspect could not be deleted"
+    )
 
-    query = """
-        DELETE FROM suspects
-        WHERE id = %s
-    """
-
-    try:
-
-        cursor.execute(query, (suspect_id,))
-
-        connection.commit()
-
-    except mysql.connector.Error as error:
-
-        connection.rollback()
-
-        cursor.close()
-        connection.close()
-
-        return f"Suspect could not be deleted: {error}"
-
-    cursor.close()
-    connection.close()
+    if error:
+        return error
 
     return redirect(url_for("suspects"))
 
@@ -1037,26 +800,9 @@ def delete_suspect(suspect_id):
 @role_required("admin", "investigator")
 def evidence():
 
-    connection = get_db_connection()
-    cursor = connection.cursor(dictionary=True)
+    evidence_list = fetch_all("SELECT * FROM evidence ORDER BY id DESC")
 
-    query = """
-        SELECT *
-        FROM evidence
-        ORDER BY id DESC
-    """
-
-    cursor.execute(query)
-
-    evidence = cursor.fetchall()
-
-    cursor.close()
-    connection.close()
-
-    return render_template(
-        "evidence.html",
-        evidence=evidence
-    )
+    return render_template("evidence.html", evidence=evidence_list)
 
 
 # =========================
@@ -1069,18 +815,18 @@ def add_evidence():
 
     if request.method == "POST":
 
-        case_number = request.form["case_number"]
-        evidence_type = request.form["evidence_type"]
-        description = request.form["description"]
-        collected_date = request.form["collected_date"]
-        collected_by = request.form["collected_by"]
-        location_found = request.form["location_found"]
-        status = request.form["status"]
+        values = (
+            request.form["case_number"],
+            request.form["evidence_type"],
+            request.form["description"],
+            request.form["collected_date"],
+            request.form["collected_by"],
+            request.form["location_found"],
+            request.form["status"]
+        )
 
-        connection = get_db_connection()
-        cursor = connection.cursor()
-
-        query = """
+        error = write_db(
+            """
             INSERT INTO evidence
             (
                 case_number,
@@ -1091,159 +837,93 @@ def add_evidence():
                 location_found,
                 status
             )
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
-        """
-
-        values = (
-            case_number,
-            evidence_type,
-            description,
-            collected_date,
-            collected_by,
-            location_found,
-            status
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+            """,
+            values,
+            "Evidence could not be added"
         )
 
-        try:
-
-            cursor.execute(query, values)
-
-            connection.commit()
-
-        except mysql.connector.Error as error:
-
-            connection.rollback()
-
-            cursor.close()
-            connection.close()
-
-            return f"Evidence could not be added: {error}"
-
-        cursor.close()
-        connection.close()
+        if error:
+            return error
 
         return redirect(url_for("evidence"))
 
     return render_template("add_evidence.html")
 
 
+# =========================
+# EDIT EVIDENCE
+# =========================
+
 @app.route("/edit-evidence/<int:evidence_id>", methods=["GET", "POST"])
 @role_required("admin", "investigator")
 def edit_evidence(evidence_id):
 
-    connection = get_db_connection()
-
     if request.method == "POST":
 
-        cursor = connection.cursor()
-
-        case_number = request.form["case_number"]
-        evidence_type = request.form["evidence_type"]
-        description = request.form["description"]
-        collected_date = request.form["collected_date"]
-        collected_by = request.form["collected_by"]
-        location_found = request.form["location_found"]
-        status = request.form["status"]
-
-        query = """
-            UPDATE evidence
-            SET
-                case_number = %s,
-                evidence_type = %s,
-                description = %s,
-                collected_date = %s,
-                collected_by = %s,
-                location_found = %s,
-                status = %s
-            WHERE id = %s
-        """
-
         values = (
-            case_number,
-            evidence_type,
-            description,
-            collected_date,
-            collected_by,
-            location_found,
-            status,
+            request.form["case_number"],
+            request.form["evidence_type"],
+            request.form["description"],
+            request.form["collected_date"],
+            request.form["collected_by"],
+            request.form["location_found"],
+            request.form["status"],
             evidence_id
         )
 
-        try:
+        error = write_db(
+            """
+            UPDATE evidence
+            SET
+                case_number = ?,
+                evidence_type = ?,
+                description = ?,
+                collected_date = ?,
+                collected_by = ?,
+                location_found = ?,
+                status = ?
+            WHERE id = ?
+            """,
+            values,
+            "Evidence could not be updated"
+        )
 
-            cursor.execute(query, values)
-
-            connection.commit()
-
-        except mysql.connector.Error as error:
-
-            connection.rollback()
-
-            cursor.close()
-            connection.close()
-
-            return f"Evidence could not be updated: {error}"
-
-        cursor.close()
-        connection.close()
+        if error:
+            return error
 
         return redirect(url_for("evidence"))
 
-    cursor = connection.cursor(dictionary=True)
-
-    query = """
-        SELECT *
-        FROM evidence
-        WHERE id = %s
-    """
-
-    cursor.execute(query, (evidence_id,))
-
-    evidence_item = cursor.fetchone()
-
-    cursor.close()
-    connection.close()
+    evidence_item = fetch_one(
+        "SELECT * FROM evidence WHERE id = ?",
+        (evidence_id,)
+    )
 
     if not evidence_item:
-
         return "Evidence not found"
 
-    return render_template(
-        "edit_evidence.html",
-        evidence=evidence_item
-    )
+    return render_template("edit_evidence.html", evidence=evidence_item)
+
+
+# =========================
+# DELETE EVIDENCE
+# =========================
 
 @app.route("/delete-evidence/<int:evidence_id>", methods=["POST"])
 @role_required("admin", "investigator")
 def delete_evidence(evidence_id):
 
-    connection = get_db_connection()
-    cursor = connection.cursor()
+    error = write_db(
+        "DELETE FROM evidence WHERE id = ?",
+        (evidence_id,),
+        "Evidence could not be deleted"
+    )
 
-    query = """
-        DELETE FROM evidence
-        WHERE id = %s
-    """
-
-    try:
-
-        cursor.execute(query, (evidence_id,))
-
-        connection.commit()
-
-    except mysql.connector.Error as error:
-
-        connection.rollback()
-
-        cursor.close()
-        connection.close()
-
-        return f"Evidence could not be deleted: {error}"
-
-    cursor.close()
-    connection.close()
+    if error:
+        return error
 
     return redirect(url_for("evidence"))
+
 
 # ==================================================
 # INVESTIGATION MANAGEMENT
@@ -1253,25 +933,13 @@ def delete_evidence(evidence_id):
 @role_required("admin", "investigator")
 def investigations():
 
-    connection = get_db_connection()
-    cursor = connection.cursor(dictionary=True)
-
-    query = """
-        SELECT *
-        FROM investigations
-        ORDER BY id DESC
-    """
-
-    cursor.execute(query)
-
-    investigations = cursor.fetchall()
-
-    cursor.close()
-    connection.close()
+    investigation_list = fetch_all(
+        "SELECT * FROM investigations ORDER BY id DESC"
+    )
 
     return render_template(
         "investigations.html",
-        investigations=investigations
+        investigations=investigation_list
     )
 
 
@@ -1285,18 +953,18 @@ def add_investigation():
 
     if request.method == "POST":
 
-        case_number = request.form["case_number"]
-        investigator = request.form["investigator"]
-        investigation_date = request.form["investigation_date"]
-        investigation_type = request.form["investigation_type"]
-        details = request.form["details"]
-        findings = request.form["findings"]
-        status = request.form["status"]
+        values = (
+            request.form["case_number"],
+            request.form["investigator"],
+            request.form["investigation_date"],
+            request.form["investigation_type"],
+            request.form["details"],
+            request.form["findings"],
+            request.form["status"]
+        )
 
-        connection = get_db_connection()
-        cursor = connection.cursor()
-
-        query = """
+        error = write_db(
+            """
             INSERT INTO investigations
             (
                 case_number,
@@ -1307,121 +975,72 @@ def add_investigation():
                 findings,
                 status
             )
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
-        """
-
-        values = (
-            case_number,
-            investigator,
-            investigation_date,
-            investigation_type,
-            details,
-            findings,
-            status
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+            """,
+            values,
+            "Investigation could not be added"
         )
 
-        try:
-
-            cursor.execute(query, values)
-
-            connection.commit()
-
-        except mysql.connector.Error as error:
-
-            connection.rollback()
-
-            cursor.close()
-            connection.close()
-
-            return f"Investigation could not be added: {error}"
-
-        cursor.close()
-        connection.close()
+        if error:
+            return error
 
         return redirect(url_for("investigations"))
 
     return render_template("add_investigation.html")
 
 
-@app.route("/edit-investigation/<int:investigation_id>", methods=["GET", "POST"])
+# =========================
+# EDIT INVESTIGATION
+# =========================
+
+@app.route(
+    "/edit-investigation/<int:investigation_id>",
+    methods=["GET", "POST"]
+)
 @role_required("admin", "investigator")
 def edit_investigation(investigation_id):
 
-    connection = get_db_connection()
-
     if request.method == "POST":
 
-        cursor = connection.cursor()
-
-        case_number = request.form["case_number"]
-        investigator = request.form["investigator"]
-        investigation_date = request.form["investigation_date"]
-        investigation_type = request.form["investigation_type"]
-        details = request.form["details"]
-        findings = request.form["findings"]
-        status = request.form["status"]
-
-        query = """
-            UPDATE investigations
-            SET
-                case_number = %s,
-                investigator = %s,
-                investigation_date = %s,
-                investigation_type = %s,
-                details = %s,
-                findings = %s,
-                status = %s
-            WHERE id = %s
-        """
-
         values = (
-            case_number,
-            investigator,
-            investigation_date,
-            investigation_type,
-            details,
-            findings,
-            status,
+            request.form["case_number"],
+            request.form["investigator"],
+            request.form["investigation_date"],
+            request.form["investigation_type"],
+            request.form["details"],
+            request.form["findings"],
+            request.form["status"],
             investigation_id
         )
 
-        try:
+        error = write_db(
+            """
+            UPDATE investigations
+            SET
+                case_number = ?,
+                investigator = ?,
+                investigation_date = ?,
+                investigation_type = ?,
+                details = ?,
+                findings = ?,
+                status = ?
+            WHERE id = ?
+            """,
+            values,
+            "Investigation could not be updated"
+        )
 
-            cursor.execute(query, values)
-
-            connection.commit()
-
-        except mysql.connector.Error as error:
-
-            connection.rollback()
-
-            cursor.close()
-            connection.close()
-
-            return f"Investigation could not be updated: {error}"
-
-        cursor.close()
-        connection.close()
+        if error:
+            return error
 
         return redirect(url_for("investigations"))
 
-    cursor = connection.cursor(dictionary=True)
-
-    query = """
-        SELECT *
-        FROM investigations
-        WHERE id = %s
-    """
-
-    cursor.execute(query, (investigation_id,))
-
-    investigation = cursor.fetchone()
-
-    cursor.close()
-    connection.close()
+    investigation = fetch_one(
+        "SELECT * FROM investigations WHERE id = ?",
+        (investigation_id,)
+    )
 
     if not investigation:
-
         return "Investigation not found"
 
     return render_template(
@@ -1429,35 +1048,26 @@ def edit_investigation(investigation_id):
         investigation=investigation
     )
 
-@app.route("/delete-investigation/<int:investigation_id>", methods=["POST"])
+
+# =========================
+# DELETE INVESTIGATION
+# =========================
+
+@app.route(
+    "/delete-investigation/<int:investigation_id>",
+    methods=["POST"]
+)
 @role_required("admin", "investigator")
 def delete_investigation(investigation_id):
 
-    connection = get_db_connection()
-    cursor = connection.cursor()
+    error = write_db(
+        "DELETE FROM investigations WHERE id = ?",
+        (investigation_id,),
+        "Investigation could not be deleted"
+    )
 
-    query = """
-        DELETE FROM investigations
-        WHERE id = %s
-    """
-
-    try:
-
-        cursor.execute(query, (investigation_id,))
-
-        connection.commit()
-
-    except mysql.connector.Error as error:
-
-        connection.rollback()
-
-        cursor.close()
-        connection.close()
-
-        return f"Investigation could not be deleted: {error}"
-
-    cursor.close()
-    connection.close()
+    if error:
+        return error
 
     return redirect(url_for("investigations"))
 
@@ -1472,18 +1082,17 @@ def complaint():
 
     if request.method == "POST":
 
-        complaint_number = request.form["complaint_number"]
-        crime_type = request.form["crime_type"]
-        location = request.form["location"]
-        incident_date = request.form["incident_date"]
-        description = request.form["description"]
+        values = (
+            request.form["complaint_number"],
+            session.get("username"),
+            request.form["crime_type"],
+            request.form["location"],
+            request.form["incident_date"],
+            request.form["description"]
+        )
 
-        username = session.get("username")
-
-        connection = get_db_connection()
-        cursor = connection.cursor()
-
-        query = """
+        error = write_db(
+            """
             INSERT INTO complaints
             (
                 complaint_number,
@@ -1493,35 +1102,14 @@ def complaint():
                 incident_date,
                 description
             )
-            VALUES (%s, %s, %s, %s, %s, %s)
-        """
-
-        values = (
-            complaint_number,
-            username,
-            crime_type,
-            location,
-            incident_date,
-            description
+            VALUES (?, ?, ?, ?, ?, ?)
+            """,
+            values,
+            "Complaint could not be submitted"
         )
 
-        try:
-
-            cursor.execute(query, values)
-
-            connection.commit()
-
-        except mysql.connector.Error as error:
-
-            connection.rollback()
-
-            cursor.close()
-            connection.close()
-
-            return f"Complaint could not be submitted: {error}"
-
-        cursor.close()
-        connection.close()
+        if error:
+            return error
 
         return redirect(url_for("complaints"))
 
@@ -1536,29 +1124,12 @@ def complaint():
 @role_required("citizen")
 def complaints():
 
-    username = session.get("username")
-
-    connection = get_db_connection()
-    cursor = connection.cursor(dictionary=True)
-
-    query = """
-        SELECT *
-        FROM complaints
-        WHERE username = %s
-        ORDER BY id DESC
-    """
-
-    cursor.execute(query, (username,))
-
-    complaints = cursor.fetchall()
-
-    cursor.close()
-    connection.close()
-
-    return render_template(
-        "complaints.html",
-        complaints=complaints
+    complaint_list = fetch_all(
+        "SELECT * FROM complaints WHERE username = ? ORDER BY id DESC",
+        (session.get("username"),)
     )
+
+    return render_template("complaints.html", complaints=complaint_list)
 
 
 # ==================================================
@@ -1570,25 +1141,11 @@ def complaints():
 @role_required("admin", "investigator")
 def admin_complaints():
 
-    connection = get_db_connection()
-    cursor = connection.cursor(dictionary=True)
-
-    query = """
-        SELECT *
-        FROM complaints
-        ORDER BY id DESC
-    """
-
-    cursor.execute(query)
-
-    complaints = cursor.fetchall()
-
-    cursor.close()
-    connection.close()
+    complaint_list = fetch_all("SELECT * FROM complaints ORDER BY id DESC")
 
     return render_template(
         "admin_complaints.html",
-        complaints=complaints
+        complaints=complaint_list
     )
 
 
@@ -1603,39 +1160,14 @@ def admin_complaints():
 @role_required("admin", "investigator")
 def update_complaint(complaint_id):
 
-    status = request.form["status"]
-
-    connection = get_db_connection()
-    cursor = connection.cursor()
-
-    query = """
-        UPDATE complaints
-        SET status = %s
-        WHERE id = %s
-    """
-
-    values = (
-        status,
-        complaint_id
+    error = write_db(
+        "UPDATE complaints SET status = ? WHERE id = ?",
+        (request.form["status"], complaint_id),
+        "Complaint status could not be updated"
     )
 
-    try:
-
-        cursor.execute(query, values)
-
-        connection.commit()
-
-    except mysql.connector.Error as error:
-
-        connection.rollback()
-
-        cursor.close()
-        connection.close()
-
-        return f"Complaint status could not be updated: {error}"
-
-    cursor.close()
-    connection.close()
+    if error:
+        return error
 
     return redirect(url_for("admin_complaints"))
 
@@ -1648,70 +1180,15 @@ def update_complaint(complaint_id):
 @role_required("admin", "investigator")
 def reports():
 
-    connection = get_db_connection()
-    cursor = connection.cursor(dictionary=True)
-
-    # Total Cases
-    cursor.execute(
-        "SELECT COUNT(*) AS total FROM cases"
-    )
-
-    total_cases = cursor.fetchone()["total"]
-
-    # Open Cases
-    cursor.execute(
-        "SELECT COUNT(*) AS total FROM cases WHERE status = 'Open'"
-    )
-
-    open_cases = cursor.fetchone()["total"]
-
-    # Closed Cases
-    cursor.execute(
-        "SELECT COUNT(*) AS total FROM cases WHERE status = 'Closed'"
-    )
-
-    closed_cases = cursor.fetchone()["total"]
-
-    # Total Victims
-    cursor.execute(
-        "SELECT COUNT(*) AS total FROM victims"
-    )
-
-    total_victims = cursor.fetchone()["total"]
-
-    # Total Suspects
-    cursor.execute(
-        "SELECT COUNT(*) AS total FROM suspects"
-    )
-
-    total_suspects = cursor.fetchone()["total"]
-
-    # Total Evidence
-    cursor.execute(
-        "SELECT COUNT(*) AS total FROM evidence"
-    )
-
-    total_evidence = cursor.fetchone()["total"]
-
-    # Total Investigations
-    cursor.execute(
-        "SELECT COUNT(*) AS total FROM investigations"
-    )
-
-    total_investigations = cursor.fetchone()["total"]
-
-    cursor.close()
-    connection.close()
-
     return render_template(
         "reports.html",
-        total_cases=total_cases,
-        open_cases=open_cases,
-        closed_cases=closed_cases,
-        total_victims=total_victims,
-        total_suspects=total_suspects,
-        total_evidence=total_evidence,
-        total_investigations=total_investigations
+        total_cases=count_rows("cases"),
+        open_cases=count_rows("cases", "status = ?", ("Open",)),
+        closed_cases=count_rows("cases", "status = ?", ("Closed",)),
+        total_victims=count_rows("victims"),
+        total_suspects=count_rows("suspects"),
+        total_evidence=count_rows("evidence"),
+        total_investigations=count_rows("investigations")
     )
 
 
@@ -1728,9 +1205,50 @@ def logout():
 
 
 # =========================
+# CREATE ADMIN / INVESTIGATOR FROM COMMAND LINE
+# =========================
+# Usage:
+#   python app.py create-user
+# Public registration only creates citizens, so use this to create the
+# first admin or any investigator account.
+
+def create_user_cli():
+
+    from getpass import getpass
+
+    username = input("Username: ").strip()
+    email = input("Email: ").strip()
+    role = input("Role (admin / investigator / citizen): ").strip().lower()
+    password = getpass("Password (min 6 characters): ")
+
+    if role not in ("admin", "investigator", "citizen"):
+        print("Invalid role.")
+        return
+
+    if not username or not email or len(password) < 6:
+        print("Username, email and a password of 6+ characters are required.")
+        return
+
+    error = write_db(
+        "INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)",
+        (username, email, generate_password_hash(password), role),
+        "User could not be created"
+    )
+
+    print(error if error else f"User '{username}' created as {role}.")
+
+
+# Create the tables automatically (works with python app.py, gunicorn, WSGI).
+init_db()
+
+
+# =========================
 # START FLASK
 # =========================
 
 if __name__ == "__main__":
 
-    app.run(debug=True)
+    if len(sys.argv) > 1 and sys.argv[1] == "create-user":
+        create_user_cli()
+    else:
+        app.run(debug=os.getenv("FLASK_DEBUG", "false").lower() == "true")

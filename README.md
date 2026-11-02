@@ -2,7 +2,7 @@
 
 A web-based application for managing crime cases, complaints, victims, suspects, evidence, investigations, and reports.
 
-This project is developed for educational and demonstration purposes using Flask and MySQL.
+This project is developed for educational and demonstration purposes using Flask and SQLite.
 
 ## Technologies Used
 
@@ -12,7 +12,7 @@ This project is developed for educational and demonstration purposes using Flask
 - JavaScript
 - Python
 - Flask
-- MySQL
+- SQLite
 - Git
 - GitHub
 
@@ -71,7 +71,7 @@ This project is developed for educational and demonstration purposes using Flask
 
 ## Database
 
-The application uses MySQL with the following tables:
+The application uses SQLite (a single file, `crime_system.db`, created automatically on first run) with the following tables:
 
 - users
 - cases
@@ -80,6 +80,42 @@ The application uses MySQL with the following tables:
 - evidence
 - investigations
 - complaints
+
+## Setup
+
+```bash
+python -m venv venv
+venv\Scripts\activate          # Windows  (Linux/macOS: source venv/bin/activate)
+pip install -r requirements.txt
+```
+
+Create a `.env` file (see `.env.example`):
+
+```text
+FLASK_SECRET_KEY=your-long-random-secret
+```
+
+Create the first Admin account (public registration only creates Citizens):
+
+```bash
+python app.py create-user
+```
+
+Run the app:
+
+```bash
+python app.py
+```
+
+Open http://127.0.0.1:5000
+
+## Optional Environment Variables
+
+| Variable | Purpose |
+|---|---|
+| `DATABASE_PATH` | Custom location of the SQLite file |
+| `SESSION_COOKIE_SECURE` | Set to `true` when served over HTTPS |
+| `FLASK_DEBUG` | Set to `true` for debug mode (local only) |
 
 ## Project Structure
 
@@ -90,6 +126,7 @@ online-crime-investigation-system/
 ├── README.md
 ├── requirements.txt
 ├── .env
+├── .env.example
 ├── .gitignore
 │
 ├── static/
@@ -122,4 +159,5 @@ online-crime-investigation-system/
 │   ├── admin_complaints.html
 │   └── reports.html
 │
+├── crime_system.db   (created automatically)
 └── venv/
