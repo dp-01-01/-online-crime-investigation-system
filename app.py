@@ -78,13 +78,17 @@ def role_required(*roles):
 
 def get_db_connection():
 
-    return mysql.connector.connect(
-        host="127.0.0.1",
-        port=3306,
-        user=os.getenv("DB_USER"),
-        password=os.getenv("DB_PASSWORD"),
-        database=os.getenv("DB_NAME")
-    )
+    import os
+import mysql.connector
+
+conn = mysql.connector.connect(
+    host=os.getenv("DB_HOST", "localhost"),
+    port=int(os.getenv("DB_PORT", 3306)),
+    user=os.getenv("DB_USER", "root"),
+    password=os.getenv("DB_PASSWORD", "1234"),
+    database=os.getenv("DB_NAME", "crime_db"),
+)
+    
 
 
 # =========================
