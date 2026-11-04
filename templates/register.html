@@ -2,6 +2,9 @@
 
 {% block title %}
 Register - Crime Investigation System
+
+
+
 {% endblock %}
 
 {% block content %}
@@ -29,11 +32,15 @@ Register - Crime Investigation System
                         </h2>
 
                         <p class="text-muted mb-0">
-                            Register as a citizen to use the system.
+                            Choose your account type and register.
                         </p>
 
                     </div>
 
+
+                    {% if error %}
+                    <div class="alert alert-danger" role="alert">{{ error }}</div>
+                    {% endif %}
 
                     <form method="POST">
 
@@ -102,34 +109,49 @@ Register - Crime Investigation System
 
                         <!-- ROLE -->
 
-                        <div class="mb-4">
+                        <div class="mb-3">
 
                             <label class="form-label fw-semibold">
                                 Account Type
                             </label>
 
-                            <input
-                                type="text"
-                                class="form-control"
-                                value="Citizen"
-                                readonly
-                            >
-
-                            <!--
-                                The role is fixed as citizen.
-                                Admin and Investigator accounts
-                                should not be created through
-                                public registration.
-                            -->
-
-                            <input
-                                type="hidden"
+                            <select
                                 name="role"
-                                value="citizen"
+                                id="role"
+                                class="form-select"
+                                required
                             >
+                                <option value="citizen">Citizen</option>
+                                <option value="investigator">Officer (Investigator)</option>
+                                <option value="admin">Admin</option>
+                            </select>
 
                         </div>
 
+
+
+                        <!-- STAFF CODE (only for Officer / Admin) -->
+
+                        <div class="mb-3 d-none" id="staff-code-group">
+
+                            <label class="form-label fw-semibold">
+                                Staff Registration Code
+                            </label>
+
+                            <input
+                                type="password"
+                                name="staff_code"
+                                id="staff_code"
+                                class="form-control"
+                                placeholder="Enter staff code"
+                                autocomplete="off"
+                            >
+
+                            <div class="form-text">
+                                Required for Officer and Admin accounts. Ask your system administrator.
+                            </div>
+
+                        </div>
 
                         <!-- REGISTER BUTTON -->
 
@@ -168,5 +190,26 @@ Register - Crime Investigation System
     </div>
 
 </div>
+
+
+
+
+<script>
+    (function () {
+        var role = document.getElementById("role");
+        var group = document.getElementById("staff-code-group");
+        var code = document.getElementById("staff_code");
+
+        function toggleStaffCode() {
+            var isStaff = role.value === "investigator" || role.value === "admin";
+            group.classList.toggle("d-none", !isStaff);
+            code.required = isStaff;
+            if (!isStaff) { code.value = ""; }
+        }
+
+        role.addEventListener("change", toggleStaffCode);
+        toggleStaffCode();
+    })();
+</script>
 
 {% endblock %}

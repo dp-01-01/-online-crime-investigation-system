@@ -9,7 +9,7 @@ from flask import Flask, render_template, request, redirect, url_for, session
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
-# Load environment variables from .env (optional)
+# Load environment variables from .env
 load_dotenv()
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -23,7 +23,11 @@ app = Flask(__name__)
 
 # If FLASK_SECRET_KEY is not set, a random key is generated.
 # Sessions will then reset whenever the app restarts, so set it in production.
-app.secret_key = os.getenv("FLASK_SECRET_KEY") or secrets.token_hex(32)
+app.secret_key = os.getenv("FLASK_SECRET_KEY")
+if not app.secret_key:
+    raise RuntimeError(
+        "FLASK_SECRET_KEY is missing. Add it to your .env file before starting the app."
+    )
 
 
 # =========================
@@ -191,6 +195,12 @@ def count_rows(table, where="", params=()):
 
 
 # =========================
+# REGISTRATION ROLES
+# =========================
+
+REGISTRATION_ROLES = ("citizen", "investigator", "admin")
+
+# =========================
 # LOGIN REQUIRED DECORATOR
 # =========================
 
@@ -267,6 +277,8 @@ def login():
 
         if user and check_password_hash(user["password"], password):
 
+            # Clear any previous session data before establishing this login.
+            session.clear()
             session["user_id"] = user["id"]
             session["username"] = user["username"]
             session["role"] = user["role"]
@@ -287,30 +299,50 @@ def login():
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
-
     if request.method == "POST":
-
         username = request.form.get("username", "").strip()
-        email = request.form.get("email", "").strip()
+        email = request.form.get("email", "").strip().lower()
         password = request.form.get("password", "")
+        role = request.form.get("role", "citizen").strip().lower()
 
-        # Public registration is always for citizens.
-        # Do not trust the role sent by the browser.
-        role = "citizen"
-
-        if not username or not email or not password:
-
+        # Never trust the role sent by the browser; validate it on the server.
+        if role not in REGISTRATION_ROLES:
             return render_template(
                 "register.html",
-                error="Please fill in all fields."
+                error="Invalid account type selected."
+            )
+
+        if not username or not email or not password:
+            return render_template(
+                "register.html",
+                error="Please fill in all required fields."
             )
 
         if len(password) < 6:
-
             return render_template(
                 "register.html",
                 error="Password must contain at least 6 characters."
             )
+
+        # Admin and Officer (stored as investigator) accounts require a
+        # private code configured in .env. Citizen registration stays open.
+        if role in ("admin", "investigator"):
+            configured_staff_code = os.getenv("STAFF_REGISTRATION_CODE")
+            submitted_staff_code = request.form.get("staff_code", "").strip()
+
+            if not configured_staff_code:
+                return render_template(
+                    "register.html",
+                    error="Staff registration is currently disabled. Contact the system administrator."
+                )
+
+            if not submitted_staff_code or not secrets.compare_digest(
+                submitted_staff_code, configured_staff_code
+            ):
+                return render_template(
+                    "register.html",
+                    error="Invalid staff registration code."
+                )
 
         existing_user = fetch_one(
             "SELECT id FROM users WHERE username = ? OR email = ?",
@@ -318,7 +350,6 @@ def register():
         )
 
         if existing_user:
-
             return render_template(
                 "register.html",
                 error="Username or email already exists. Please use a different one."
@@ -334,7 +365,6 @@ def register():
         )
 
         if error:
-
             return render_template(
                 "register.html",
                 error="Registration failed. Please try again."
@@ -343,7 +373,6 @@ def register():
         return redirect(url_for("login"))
 
     return render_template("register.html")
-
 
 # =========================
 # DASHBOARD PAGE
@@ -1209,8 +1238,8 @@ def logout():
 # =========================
 # Usage:
 #   python app.py create-user
-# Public registration only creates citizens, so use this to create the
-# first admin or any investigator account.
+# Use this command when you want to create an account directly from the terminal.
+# Website registration requires STAFF_REGISTRATION_CODE for admin/investigator roles.\n# Keep this CLI command restricted to trusted administrators with local machine access.
 
 def create_user_cli():
 
@@ -1238,6 +1267,40 @@ def create_user_cli():
     print(error if error else f"User '{username}' created as {role}.")
 
 
+def list_users_cli():
+
+    rows = fetch_all("SELECT id, username, email, role FROM users ORDER BY id")
+
+    if not rows:
+        print("No users found.")
+        return
+
+    for row in rows:
+        print(f"{row['id']:>3}  {row['username']:<20} {row['role']:<13} {row['email']}")
+
+
+def set_role_cli():
+
+    # Usage: python app.py set-role <username> <admin|investigator|citizen>
+    if len(sys.argv) != 4 or sys.argv[3] not in ("admin", "investigator", "citizen"):
+        print("Usage: python app.py set-role <username> <admin|investigator|citizen>")
+        return
+
+    username, role = sys.argv[2], sys.argv[3]
+
+    if not fetch_one("SELECT id FROM users WHERE username = ?", (username,)):
+        print(f"User '{username}' not found. Run: python app.py list-users")
+        return
+
+    error = write_db(
+        "UPDATE users SET role = ? WHERE username = ?",
+        (role, username),
+        "Role could not be changed"
+    )
+
+    print(error if error else f"'{username}' is now {role}. Log out and log in again.")
+
+
 # Create the tables automatically (works with python app.py, gunicorn, WSGI).
 init_db()
 
@@ -1250,5 +1313,9 @@ if __name__ == "__main__":
 
     if len(sys.argv) > 1 and sys.argv[1] == "create-user":
         create_user_cli()
+    elif len(sys.argv) > 1 and sys.argv[1] == "list-users":
+        list_users_cli()
+    elif len(sys.argv) > 1 and sys.argv[1] == "set-role":
+        set_role_cli()
     else:
         app.run(debug=os.getenv("FLASK_DEBUG", "false").lower() == "true")
